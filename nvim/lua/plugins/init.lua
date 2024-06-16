@@ -26,6 +26,10 @@ use {'nvim-treesitter/nvim-treesitter',
 use {'nvim-telescope/telescope.nvim', tag = '0.1.6',
   requires = { {'nvim-lua/plenary.nvim'} }
 }
+use 'williamboman/mason.nvim'
+use 'williamboman/mason-lspconfig.nvim'
+use 'neovim/nvim-lspconfig'
+
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
