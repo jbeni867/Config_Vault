@@ -5,6 +5,10 @@ vim.g.loaded_netrwPlugin = 1
 -- optionally enable 24-bit colour
 vim.opt.termguicolors = true
 
+-- Nvim-Tree Keymaps
+vim.keymap.set('n', '<Leader>;', '<cmd>:NvimTreeToggle<cr>')
+vim.keymap.set('n', '<s-esc>', '<cmd>:NvimTreeClose<cr>')
+
 -- setup with some options
 require("nvim-tree").setup({
   sort = {

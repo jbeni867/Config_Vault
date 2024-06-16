@@ -10,7 +10,3 @@ vim.opt.scrolloff = 20
 -- Ease of Use
 vim.opt.number = true
 vim.opt.relativenumber = true
-
--- Nvim-Tree Keymaps
-vim.keymap.set('n', '<Leader>;', '<cmd>:NvimTreeToggle<cr>')
-vim.keymap.set('n', '<s-esc>', '<cmd>:NvimTreeClose<cr>')
