@@ -1,4 +1,5 @@
 require("keymaps")
+require("plugins")
 
 require("plugins/lsp_config")
 require("plugins/onedark_config")
@@ -8,49 +9,3 @@ require("plugins/nvim-treesitter_config")
 require("plugins/telescope_config")
 require("plugins/none-ls_config")
 require("plugins/completions_config")
-
-
--- Installing Packer if not installed
-local ensure_packer = function()
-  local fn = vim.fn
-  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
-end
-
-local packer_bootstrap = ensure_packer()
-
-return require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
-
-  -- My plugins here
-use 'navarasu/onedark.nvim'
-use 'nvim-tree/nvim-tree.lua'
-use 'nvim-tree/nvim-web-devicons'
-use 'nvim-lualine/lualine.nvim'
-use {'nvim-treesitter/nvim-treesitter',
-      run = function()
-          local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
-          ts_update()
-      end,
-    }
-use {'nvim-telescope/telescope.nvim', tag = '0.1.6',
-  requires = { {'nvim-lua/plenary.nvim'} }
-}
-use 'williamboman/mason.nvim'
-use 'williamboman/mason-lspconfig.nvim'
-use 'neovim/nvim-lspconfig'
-use 'nvim-telescope/telescope-ui-select.nvim'
-use 'nvimtools/none-ls.nvim'
-use 'hrsh7th/nvim-cmp'
-
-  -- Automatically set up your configuration after cloning packer.nvim
-  -- Put this at the end after all plugins
-  if packer_bootstrap then
-    require('packer').sync()
-  end
-end)
