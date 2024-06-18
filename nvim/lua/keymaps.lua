@@ -13,7 +13,7 @@ vim.opt.relativenumber = true
 
 -- Tab Formatting
 vim.opt.expandtab = true
--- vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.wrap = false
