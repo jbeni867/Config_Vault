@@ -33,7 +33,7 @@ use 'williamboman/mason.nvim'
 use 'williamboman/mason-lspconfig.nvim'
 use 'neovim/nvim-lspconfig'
 use 'nvim-telescope/telescope-ui-select.nvim'
-
+use 'nvimtools/none-ls.nvim'
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
