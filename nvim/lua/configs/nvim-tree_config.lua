@@ -6,21 +6,21 @@ vim.g.loaded_netrwPlugin = 1
 vim.opt.termguicolors = true
 
 -- Nvim-Tree Keymaps
-vim.keymap.set('n', '<Leader>;', '<cmd>:NvimTreeFocus<cr>')
-vim.keymap.set('n', '<Leader><ESC>', '<cmd>:NvimTreeClose<cr>')
+vim.keymap.set("n", "<Leader>;", "<cmd>:NvimTreeFocus<cr>")
+vim.keymap.set("n", "<Leader><ESC>", "<cmd>:NvimTreeClose<cr>")
 
 -- setup with some options
 require("nvim-tree").setup({
-  sort = {
-    sorter = "case_sensitive",
-  },
-  view = {
-    width = 40,
-  },
-  renderer = {
-    group_empty = true,
-  },
-  filters = {
-    dotfiles = false,
-  },
+	sort = {
+		sorter = "case_sensitive",
+	},
+	view = {
+		width = 40,
+	},
+	renderer = {
+		group_empty = true,
+	},
+	filters = {
+		dotfiles = false,
+	},
 })
