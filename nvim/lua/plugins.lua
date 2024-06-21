@@ -44,6 +44,7 @@ return require("packer").startup(function(use)
 	use("saadparwaiz1/cmp_luasnip")
 	use("rafamadriz/friendly-snippets")
 	use("hrsh7th/cmp-nvim-lsp")
+	use("windwp/nvim-autopairs")
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
