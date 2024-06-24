@@ -10,6 +10,7 @@ vim.opt.scrolloff = 20
 -- Ease of Use
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.sidescrolloff = 20
 
 -- Tab Formatting
 vim.opt.expandtab = true
