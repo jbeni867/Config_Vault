@@ -46,6 +46,9 @@ return require("packer").startup(function(use)
 	use("hrsh7th/cmp-nvim-lsp")
 	use("windwp/nvim-autopairs")
     use("barrett-ruth/live-server.nvim");
+    use("tpope/vim-dadbod");
+    use("kristijanhusak/vim-dadbod-ui");
+    use("kristijanhusak/vim-dadbod-completion");
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins
