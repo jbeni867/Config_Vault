@@ -49,6 +49,7 @@ return require("packer").startup(function(use)
     use("tpope/vim-dadbod");
     use("kristijanhusak/vim-dadbod-ui");
     use("kristijanhusak/vim-dadbod-completion");
+    use({"folke/noice.nvim", requires = {{"MunifTanjim/nui.nvim"}}});
 
 	-- Automatically set up your configuration after cloning packer.nvim
 	-- Put this at the end after all plugins

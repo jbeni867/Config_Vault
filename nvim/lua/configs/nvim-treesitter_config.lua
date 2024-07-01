@@ -14,6 +14,7 @@ require("nvim-treesitter.configs").setup({
 		"css",
 		"json",
 		"sql",
+        "regex",
 	},
 
 	-- Install parsers synchronously (only applied to `ensure_installed`)
