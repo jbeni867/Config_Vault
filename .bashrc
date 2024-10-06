@@ -91,7 +91,10 @@ fi
 alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
+
+alias fzf='fzf --preview "bat --style=numbers --color=always {}"'
 alias nv='nvim'
+alias nvfzf='nvim $(fzf --preview="bat --style=numbers --color=always {}")'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
