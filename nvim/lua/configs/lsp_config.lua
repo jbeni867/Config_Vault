@@ -1,7 +1,7 @@
 require("mason").setup()
 
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "omnisharp", "basedpyright", "html", "cssls", "eslint", "yamlls", "sqlls"},
+	ensure_installed = { "lua_ls", "omnisharp", "basedpyright", "html", "cssls", "eslint", "yamlls", "sqlls", "jedi_language_server"},
 })
 
 local on_attach = function(_, _)
@@ -24,3 +24,4 @@ require("lspconfig").cssls.setup({ on_attach = on_attach, capabilities = capabil
 require("lspconfig").eslint.setup({ on_attach = on_attach, capabilities = capabilities })
 require("lspconfig").yamlls.setup({ on_attach = on_attach, capabilities = capabilities })
 require("lspconfig").sqlls.setup({ on_attach = on_attach, capabilities = capabilities })
+require("lspconfig").jedi_language_server.setup({ on_attach = on_attach, capabilities = capabilities })
