@@ -2,6 +2,14 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Vim-Tmux-Navigation
+--  In order to switch from pane to pane with ctrl
+vim.keymap.set('n', '<c-k>', ':wincmd k<CR>')
+vim.keymap.set('n', '<c-j>', ':wincmd j<CR>')
+vim.keymap.set('n', '<c-h>', ':wincmd h<CR>')
+vim.keymap.set('n', '<c-l>', ':wincmd l<CR>')
+
+
 -- Search Tweaks
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
