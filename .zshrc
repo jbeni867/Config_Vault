@@ -4,7 +4,7 @@ if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] &&
 fi
 
 # Setting path varibale to include additional folders
-export PATH=$PATH:/Users/jordy/.spicetify:/Users/jordy/.dotnet/tools
+export PATH=$PATH:$HOME/.spicetify:$HOME/.dotnet/tools:$HOME/.config/emacs/bin/
 
 # Setting default editor for terminal
 export EDITOR=nvim
