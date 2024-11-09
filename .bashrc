@@ -95,7 +95,7 @@ alias l='ls -CF'
 alias fzf='fzf --preview "bat --style=numbers --color=always {}"'
 alias nv='nvim'
 alias nvfzf='nvim $(fzf --preview="bat --style=numbers --color=always {}")'
-alias emacs="emacsclient -c -a 'emacs'"
+# alias emacs="emacsclient -c -a 'emacs'"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -130,5 +130,5 @@ fi
 export EDITOR=nvim
 
 # Adding to $PATH variable
-export PATH="$PATH:$HOME/.config/emacs/bin/"
-
+export PATH=$PATH:$HOME/.emacs.d/bin/
+export DOOMDIR=$HOME/.config/doom/
