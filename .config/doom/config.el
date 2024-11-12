@@ -4,6 +4,7 @@
 ;; sync' after modifying this file!
 
 (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 13))
+(setq python-shell-interpreter "python3")
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
