@@ -16,3 +16,8 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 alias fzf='fzf --preview "bat --style=numbers --color=always {}"'
 alias nv='nvim'
 alias nvfzf='nvim $(fzf --preview="bat --style=numbers --color=always {}")'
+
+# Setting up pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
