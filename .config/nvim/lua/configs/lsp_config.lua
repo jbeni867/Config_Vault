@@ -1,7 +1,7 @@
 require("mason").setup()
 
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "omnisharp", "basedpyright", "html", "cssls", "eslint", "yamlls", "sqlls", "jedi_language_server"},
+	ensure_installed = { "lua_ls", "omnisharp", "pyright", "html", "cssls", "eslint", "yamlls", "sqlls", "basedpyright"},
 })
 
 local on_attach = function(_, _)
@@ -18,6 +18,7 @@ local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 require("lspconfig").lua_ls.setup({ on_attach = on_attach, capabilities = capabilities })
 require("lspconfig").omnisharp.setup({ on_attach = on_attach, capabilities = capabilities })
+require("lspconfig").pyright.setup({ on_attach = on_attach, capabilities = capabilities })
 require("lspconfig").basedpyright.setup({ on_attach = on_attach, capabilities = capabilities })
 require("lspconfig").html.setup({ on_attach = on_attach, capabilities = capabilities })
 require("lspconfig").cssls.setup({ on_attach = on_attach, capabilities = capabilities })
