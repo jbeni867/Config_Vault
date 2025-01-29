@@ -1,7 +1,7 @@
 # Opening tmux on terminal startup
-if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-  exec tmux
-fi
+# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+#   exec tmux
+# fi
 
 # Setting path varibale to include additional folders
 export PATH=$PATH:$HOME/.spicetify:$HOME/.dotnet/tools:$HOME/.emacs.d/bin:$HOME/bin:/Users/jordy/.local/bin:/usr/local/opt/tcl-tk/bin
