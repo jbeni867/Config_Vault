@@ -51,3 +51,4 @@
 
 (package! evil-tutor)
 (package! exec-path-from-shell)
+(package! restclient)
