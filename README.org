@@ -4,8 +4,8 @@
 ** Configuring system
 + Linux
  #+begin_src sh
-curl https://raw.githubusercontent.com/jbeni867/temporary/refs/heads/main/greetings.sh | bash
- #+end_src
+curl https://raw.githubusercontent.com/jbeni867/Config_Vault/refs/heads/main/Setup/linux_setup.sh | bash
+#+end_src
 
 + Windows
 
