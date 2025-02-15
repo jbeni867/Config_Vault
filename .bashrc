@@ -147,3 +147,25 @@ eval "$(pyenv init -)"
 
 #Loading pyenv-virtualenv
 eval "$(pyenv virtualenv-init -)"
+
+function gccodin() {
+    if [[ -z "$1" ]]; then
+        echo "Usage: compile_c <filename.c>"
+        return 1
+    fi
+
+    if [[ "$1" != *.c ]]; then
+        echo "Error: Filename must have a .c extension"
+        return 1
+    fi
+
+    local filename="${1%.c}"  # Remove .c extension for output name
+
+    gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -ansi -pedantic-errors -o "$filename" "$1"
+
+    if [[ $? -eq 0 ]]; then
+        echo "Compilation successful: ./$filename"
+    else
+        echo "Compilation failed."
+    fi
+}
