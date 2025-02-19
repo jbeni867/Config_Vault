@@ -95,6 +95,8 @@ alias l='ls -CF'
 alias fzf='fzf --preview "bat --style=numbers --color=always {}"'
 alias nv='nvim'
 alias nvfzf='nvim $(fzf --preview="bat --style=numbers --color=always {}")'
+alias powertop='sudo powertop'
+alias powerstat='sudo tlp-stat -b -s'
 # alias emacs="emacsclient -c -a 'emacs'"
 
 # Add an "alert" alias for long running commands.  Use like so:

@@ -14,11 +14,11 @@ sudo apt-get install neovim -y
 
 # Install pyenv and configure Python
 curl -fsSL https://pyenv.run | bash
-bash --login -c "pyenv install 3.12.0 && pyenv global 3.12.0"
+## bash --login -c "pyenv install 3.12.0 && pyenv global 3.12.0"
 
 # Install NVM and Node.js
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-bash --login -c "nvm install node && nvm use node"
+## bash --login -c "nvm install node && nvm use node"
 
 # Clone and apply dotfiles from Config_Vault
 git clone https://github.com/jbeni867/Config_Vault ~/Config_Vault
@@ -29,9 +29,14 @@ git restore .
 # Install Doom Emacs
 git clone https://github.com/hlissner/doom-emacs ~/.emacs.d
 ~/.emacs.d/bin/doom install
-doom sync
+~/.emacs.d/bin/doom sync
 
 # Install Tmux Plugin Manager
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
+<<<<<<< Updated upstream
 mkdir ~/Development
+=======
+# Install NordVPN
+sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh)
+>>>>>>> Stashed changes
