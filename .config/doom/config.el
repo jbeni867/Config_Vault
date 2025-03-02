@@ -76,7 +76,14 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
+;; PERSONAL
+;; 1. When starting up in emacsclient, it won't create an additional workspace
 (after! persp-mode
   (setq persp-emacsclient-init-frame-behaviour-override
         `(+workspace-current-name))
   )
+
+;; 2. Setting scrolloff
+(setq scroll-margin 10)
+(setq hscroll-margin 20)
+
