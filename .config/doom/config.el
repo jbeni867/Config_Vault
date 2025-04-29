@@ -87,3 +87,10 @@
 (setq scroll-margin 10)
 (setq hscroll-margin 20)
 
+;; 3. Setting global relative line numbers
+(setq display-line-numbers-type 'relative)
+(global-display-line-numbers-mode)
+(add-hook 'pdf-view-mode-hook (lambda () (display-line-numbers-mode -1)))
+
+;; 4. Removing title bar
+(tool-bar-mode -1)

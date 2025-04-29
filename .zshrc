@@ -37,7 +37,8 @@ function gccodin() {
 
     local filename="${1%.c}"  # Remove .c extension for output name
 
-    gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -ansi -pedantic-errors -o "$filename" "$1"
+    gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -o "$filename" "$1"
+
 
     if [[ $? -eq 0 ]]; then
         echo "Compilation successful: ./$filename"
