@@ -95,8 +95,12 @@ alias l='ls -CF'
 alias fzf='fzf --preview "bat --style=numbers --color=always {}"'
 alias nv='nvim'
 alias nvfzf='nvim $(fzf --preview="bat --style=numbers --color=always {}")'
+
 alias powertop='sudo powertop'
 alias powerstat='sudo tlp-stat -b -s'
+
+alias tsu='sudo tailscale up'
+alias tsd='sudo tailscale down'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -149,6 +153,7 @@ eval "$(pyenv init -)"
 #Loading pyenv-virtualenv
 eval "$(pyenv virtualenv-init -)"
 
+#function to connect to UNO odin server, and compile with gcc
 function gccodin() {
     if [[ -z "$1" ]]; then
         echo "Usage: compile_c <filename.c>"
