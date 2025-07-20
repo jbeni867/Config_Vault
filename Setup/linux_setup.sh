@@ -12,11 +12,15 @@ git restore .
 
 # Install pyenv and configure Python
 curl -fsSL https://pyenv.run | bash
-bash --login -i -c 'pyenv install 3.12.0 && pyenv global 3.12.0'
+exec "$SHELL"
+pyenv install 3.12.0 && pyenv global 3.12.0
 
 # Install NVM and Node.js
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-bash --login -i -c 'nvm install node && nvm use node'
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+nvm install node && nvm use node
 
 # Install Neovim
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
@@ -39,3 +43,10 @@ sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh)
 
 # Create Dev Folder
 mkdir ~/Development
+
+# Setup Git-Credential-Manager
+dotnet tool install -g git-credential-manager
+exec "$SHELL"
+git config --global credential.credentialStore secretservice
+git-credential-manager github login
+git-credential-manager configure
