@@ -2,7 +2,7 @@
 
 # Update and install essential packages
 sudo apt-get update && sudo apt-get upgrade -y
-sudo apt-get install git dotnet-sdk-8.0 stow emacs ripgrep fd-find make cmake fzf lf nextcloud-desktop kitty build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev texlive dvipng texlive-latex-extra libtool libvterm-dev software-properties-common tmux ttf-mscorefonts-installer caffeine tldr qbittorrent tlp powertop -y
+sudo apt-get install git dotnet-sdk-8.0 stow emacs ripgrep fd-find make cmake fzf lf nextcloud-desktop kitty build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev texlive dvipng texlive-latex-extra libtool libvterm-dev software-properties-common tmux ttf-mscorefonts-installer caffeine tldr qbittorrent tlp powertop btop -y
 
 # Clone and apply dotfiles from Config_Vault
 git clone https://github.com/jbeni867/Config_Vault ~/Config_Vault
@@ -12,7 +12,9 @@ git restore .
 
 # Install pyenv and configure Python
 curl -fsSL https://pyenv.run | bash
-exec "$SHELL"
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
 pyenv install 3.12.0 && pyenv global 3.12.0
 
 # Install NVM and Node.js
@@ -46,7 +48,7 @@ mkdir ~/Development
 
 # Setup Git-Credential-Manager
 dotnet tool install -g git-credential-manager
-exec "$SHELL"
+# exec "$SHELL"
 git config --global credential.credentialStore secretservice
 git-credential-manager github login
 git-credential-manager configure
