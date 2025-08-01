@@ -102,6 +102,8 @@ alias powerstat='sudo tlp-stat -b -s'
 alias tsu='sudo tailscale up'
 alias tsd='sudo tailscale down'
 
+alias rofi='rofi -show drun -dpi 0'
+
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -154,24 +156,24 @@ eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
 #function to connect to UNO odin server, and compile with gcc
-function gccodin() {
-    if [[ -z "$1" ]]; then
-        echo "Usage: compile_c <filename.c>"
-        return 1
-    fi
-
-    if [[ "$1" != *.c ]]; then
-        echo "Error: Filename must have a .c extension"
-        return 1
-    fi
-
-    local filename="${1%.c}"  # Remove .c extension for output name
-
-    gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -o "$filename" "$1"
-
-    if [[ $? -eq 0 ]]; then
-        echo "Compilation successful: ./$filename"
-    else
-        echo "Compilation failed."
-    fi
-}
+# function gccodin() {
+#     if [[ -z "$1" ]]; then
+#         echo "Usage: compile_c <filename.c>"
+#         return 1
+#     fi
+#
+#     if [[ "$1" != *.c ]]; then
+#         echo "Error: Filename must have a .c extension"
+#         return 1
+#     fi
+#
+#     local filename="${1%.c}"  # Remove .c extension for output name
+#
+#     gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -o "$filename" "$1"
+#
+#     if [[ $? -eq 0 ]]; then
+#         echo "Compilation successful: ./$filename"
+#     else
+#         echo "Compilation failed."
+#     fi
+# }

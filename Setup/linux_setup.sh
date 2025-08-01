@@ -52,3 +52,15 @@ dotnet tool install -g git-credential-manager
 git config --global credential.credentialStore secretservice
 git-credential-manager github login
 git-credential-manager configure
+
+mkdir ~/Development
+
+# Setup Git-Credential-Manager
+dotnet tool install -g git-credential-manager
+# exec "$SHELL"
+git config --global credential.credentialStore secretservice
+git-credential-manager github login
+git-credential-manager configure
+
+git config --global user.name "jbenitez"
+git config --global user.email "jordybeni867@gmail.com"
