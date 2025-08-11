@@ -10,8 +10,6 @@ export DOOMDIR=$HOME/.config/doom/
 # Setting default editor for terminal
 export EDITOR=nvim
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
 # Additional Aliases
 alias fzf='fzf --preview "bat --style=numbers --color=always {}"'
 alias nv='nvim'
