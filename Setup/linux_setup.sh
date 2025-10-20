@@ -4,6 +4,9 @@
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt-get install git dotnet-sdk-8.0 stow emacs ripgrep fd-find make cmake fzf lf nextcloud-desktop kitty build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev curl libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev texlive dvipng texlive-latex-extra libtool libvterm-dev software-properties-common tmux ttf-mscorefonts-installer caffeine tldr qbittorrent tlp powertop btop openjdk-21-jdk -y
 
+# Install flatpacks
+flatpack install me.timschneeberger.GalaxyBudsClient com.plexamp.Plexamp tv.plex.PlexDesktop com.discordapp.Discord com.spotify.Client -y
+
 # Clone and apply dotfiles from Config_Vault
 git clone https://github.com/jbeni867/Config_Vault ~/Config_Vault
 cd ~/Config_Vault

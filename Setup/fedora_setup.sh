@@ -5,9 +5,12 @@ sudo dnf in neovim emacs dotnet-sdk-8.0 dotnet-sdk-9.0 stow ripgrep fd-find cmak
 sudo dnf in make gcc patch zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel libuuid-devel gdbm-libs libnsl2 -y
 sudo dnf in @development-tools zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz-devel libffi-devel findutils tk-devel tcl-devel -y
 
-# Intstall lf file manager
+# Install lf file manager
 sudo dnf copr enable pennbauman/ports
 sudo dnf in lf -y
+
+# Install flatpacks
+flatpack install me.timschneeberger.GalaxyBudsClient com.plexamp.Plexamp tv.plex.PlexDesktop com.discordapp.Discord com.spotify.Client -y
 
 # Clone and apply dotfiles from Config_Vault
 git clone https://github.com/jbeni867/Config_Vault ~/Config_Vault
