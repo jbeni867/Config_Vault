@@ -104,6 +104,16 @@ alias tsd='sudo tailscale down'
 
 alias rofi='rofi -show drun -dpi 0'
 
+alias v1='amixer sset 'Master' 10%'
+alias v2='amixer sset 'Master' 20%'
+alias v3='amixer sset 'Master' 30%'
+alias v4='amixer sset 'Master' 40%'
+alias v5='amixer sset 'Master' 50%'
+alias v6='amixer sset 'Master' 60%'
+alias v7='amixer sset 'Master' 70%'
+alias v8='amixer sset 'Master' 80%'
+alias v9='amixer sset 'Master' 90%'
+alias v10='amixer sset 'Master' 100%'
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -129,9 +139,9 @@ if ! shopt -oq posix; then
 fi
 
 # Opening tmux on terminal startup
-if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-  exec tmux
-fi
+# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+#   exec tmux
+# fi
 
 # Setting default editor for terminal
 export EDITOR=nvim
