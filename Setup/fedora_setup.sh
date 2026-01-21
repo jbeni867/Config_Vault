@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Update and install essential packages
-sudo dnf in neovim emacs dotnet-sdk-8.0 dotnet-sdk-9.0 stow ripgrep fd-find cmake fzf nextcloud kitty texlive texlive-latex libtool libvterm-devel tmux mscore-fonts tldr btop -y
+sudo dnf in neovim emacs dotnet-sdk-8.0 dotnet-sdk-9.0 stow ripgrep fd-find cmake fzf nextcloud-client kitty texlive texlive-latex libtool libvterm-devel tmux mscore-fonts tldr btop -y
 sudo dnf in make gcc patch zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel libuuid-devel gdbm-libs libnsl2 -y
 sudo dnf in @development-tools zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel xz-devel libffi-devel findutils tk-devel tcl-devel -y
 
