@@ -1,2 +1,5 @@
 .config/tmux/plugins/
 .config/nvim/plugin/
+
+.local/share/fonts/*
+!.local/share/fonts/JetBrainsMono/
