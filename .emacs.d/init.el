@@ -21,9 +21,6 @@
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
-;;(unless (package-installed-p 'evil)
-  ;;(package-install 'evil))
-
 (require 'use-package)
 (setq use-package-always-ensure t)
 

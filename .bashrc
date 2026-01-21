@@ -118,6 +118,13 @@ alias v10='amixer sset 'Master' 100%'
 #   sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
+#Alias to set brightness on ThinkPad T480
+alias b1='sudo sh -c "echo 151 > /sys/class/backlight/intel_backlight/brightness"'
+alias b3='sudo sh -c "echo 378 > /sys/class/backlight/intel_backlight/brightness"'
+alias b5='sudo sh -c "echo 757 > /sys/class/backlight/intel_backlight/brightness"'
+alias b7='sudo sh -c "echo 1136 > /sys/class/backlight/intel_backlight/brightness"'
+alias b10='sudo sh -c "echo 1515 > /sys/class/backlight/intel_backlight/brightness"'
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
