@@ -7,8 +7,6 @@
 
 (menu-bar-mode -1)      ; Disable the menu bar
 
-(load-theme 'tango-dark)
-
 ;; Initialize package sources
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -22,6 +20,9 @@
 ;; Initialize use-package on non-linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
+
+;;(unless (package-installed-p 'evil)
+  ;;(package-install 'evil))
 
 (require 'use-package)
 (setq use-package-always-ensure t)
@@ -54,17 +55,115 @@
   :config
   (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
 
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(keymap-global-set "<escape>" 'keyboard-escape-quit)
 
 (use-package doom-modeline
   :ensure t
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 
+(use-package all-the-icons)
+
 (global-display-line-numbers-mode t)
+(setq display-line-numbers 'relative)
 (column-number-mode)
 
 (dolist (mode '(org-mode-hook
 		term-mode-hook
 		eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.2))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+(use-package doom-themes
+  :config
+  (load-theme 'doom-one t))
+
+;;(keymap-global-set "C-M-j" 'counsel-switch-buffer)
+
+;;keymap-set instead of define-key
+
+;;(keymap-set emacs-lisp-mode-map "C-x M-t" 'counsel-load-theme)
+
+(use-package general
+  :ensure t
+  :init
+  (general-create-definer void/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  
+  :config
+  (void/leader-keys
+    "t"  '(:ignore t :which-key "toggles")
+    "tt" '(counsel-load-theme :which-key "choose theme")))
+
+(defun void/evil-hook ()
+  (dolist (mode '(custom-mode
+		  eshell-mode
+		  git-rebase-mode
+		  erc-mode
+		  circe-server-mode
+		  circe-chat-mode
+		  circe-query-mode
+		  sauron-mode
+		  term-mode))
+    (add-to-list 'evil-emacs-state-modes mode)))
+
+(use-package evil
+  :ensure t
+  :demand t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  :hook (evil-mode . void/evil-hook)
+  :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+(use-package hydra)
+
+(defhydra hydra-text-scale (:timeout 6)
+	   "scale text"
+	   ("j" text-scale-increase "in")
+	   ("k" text-scale-decrease "out")
+	   ("f" nil "finished" :exit t))
+
+(void/leader-keys
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
