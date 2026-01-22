@@ -7,7 +7,7 @@
 
 (menu-bar-mode -1)      ; Disable the menu bar
 
-;;Initialize package sources
+;; Initialize package sources
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("org" . "https://orgmode.org/elpa/")
@@ -17,13 +17,13 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;;Initialize use-package on non-linux platforms
+;; Initialize use-package on non-linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-;;Installing and configuring packages
+;; Installing and configuring packages
 (use-package command-log-mode)
 
 (use-package ivy
@@ -122,7 +122,7 @@
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-  ;; Use visual line motions even outside of visual-line-mode buffers
+  ; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
   (evil-set-initial-state 'messages-buffer-mode 'normal)
@@ -146,7 +146,7 @@
   (when (file-directory-p "~/Development")
     (setq projectile-project-search-path '("~/Development")))
   (setq projectile-switch-project-action #'projectile-dired))
-;; TODO: Add info about <M-o> giving more info on additional operations
+; TODO: Add info about <M-o> giving more info on additional operations
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
@@ -154,7 +154,7 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-;;Setting variables
+;; Setting variables
 (keymap-global-set "<escape>" 'keyboard-escape-quit)
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
