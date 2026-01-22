@@ -7,7 +7,7 @@
 
 (menu-bar-mode -1)      ; Disable the menu bar
 
-;; Initialize package sources
+;;Initialize package sources
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("org" . "https://orgmode.org/elpa/")
@@ -17,13 +17,13 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-;; Initialize use-package on non-linux platforms
+;;Initialize use-package on non-linux platforms
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
-
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+;;Installing and configuring packages
 (use-package command-log-mode)
 
 (use-package ivy
@@ -50,9 +50,7 @@
 	 :map minibuffer-local-map
 	 ("C-r" . 'counsel-minibuffer-history))
   :config
-  (setq ivy-initial-inputs-alist nil)) ;; Don't start searches with ^
-
-(keymap-global-set "<escape>" 'keyboard-escape-quit)
+  (setq ivy-initial-inputs-alist nil))
 
 (use-package doom-modeline
   :ensure t
@@ -60,15 +58,6 @@
   :custom ((doom-modeline-height 15)))
 
 (use-package all-the-icons)
-
-(global-display-line-numbers-mode t)
-(setq display-line-numbers 'relative)
-(column-number-mode)
-
-(dolist (mode '(org-mode-hook
-		term-mode-hook
-		eshell-mode-hook))
-  (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -97,12 +86,6 @@
   :config
   (load-theme 'doom-one t))
 
-;;(keymap-global-set "C-M-j" 'counsel-switch-buffer)
-
-;;keymap-set instead of define-key
-
-;;(keymap-set emacs-lisp-mode-map "C-x M-t" 'counsel-load-theme)
-
 (use-package general
   :ensure t
   :init
@@ -110,7 +93,6 @@
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
-  
   :config
   (void/leader-keys
     "t"  '(:ignore t :which-key "toggles")
@@ -127,7 +109,6 @@
 		  sauron-mode
 		  term-mode))
     (add-to-list 'evil-emacs-state-modes mode)))
-
 (use-package evil
   :ensure t
   :demand t
@@ -141,13 +122,12 @@
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
   ;; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
   (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
+  (evil-set-initial-state 'dashboard-mode 'normal)
+  :custom ((evil-undo-system 'undo-redo)))
 
 (use-package evil-collection
   :after evil
@@ -155,6 +135,35 @@
   (evil-collection-init))
 
 (use-package hydra)
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/Development")
+    (setq projectile-project-search-path '("~/Development")))
+  (setq projectile-switch-project-action #'projectile-dired))
+;; TODO: Add info about <M-o> giving more info on additional operations
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+;;Setting variables
+(keymap-global-set "<escape>" 'keyboard-escape-quit)
+(global-display-line-numbers-mode t)
+(setq display-line-numbers-type 'relative)
+(column-number-mode)
+
+(dolist (mode '(org-mode-hook
+		term-mode-hook
+		eshell-mode-hook))
+  (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
 (defhydra hydra-text-scale (:timeout 6)
 	   "scale text"
