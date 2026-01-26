@@ -119,6 +119,8 @@ alias v10='amixer sset 'Master' 100%'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 #Alias to set brightness on ThinkPad T480
+#TODO: Get display brightness as a variable, then perform calculations within command so that it is crossplat for other devices
+alias b0='sudo sh -c "echo 0 > /sys/class/backlight/intel_backlight/brightness"'
 alias b1='sudo sh -c "echo 151 > /sys/class/backlight/intel_backlight/brightness"'
 alias b3='sudo sh -c "echo 378 > /sys/class/backlight/intel_backlight/brightness"'
 alias b5='sudo sh -c "echo 757 > /sys/class/backlight/intel_backlight/brightness"'
