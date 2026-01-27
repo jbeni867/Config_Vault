@@ -127,6 +127,8 @@ alias b5='sudo sh -c "echo 757 > /sys/class/backlight/intel_backlight/brightness
 alias b7='sudo sh -c "echo 1136 > /sys/class/backlight/intel_backlight/brightness"'
 alias b10='sudo sh -c "echo 1515 > /sys/class/backlight/intel_backlight/brightness"'
 
+alias open='xdg-open'
+
 # Alias definitions.
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
