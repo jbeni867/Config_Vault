@@ -2,6 +2,8 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.keymap.set({'', '!'}, '<c-g>', '<Esc>')
+
 -- Vim-Tmux-Navigation
 --  In order to switch from pane to pane with ctrl
 vim.keymap.set('n', '<c-k>', ':wincmd k<CR>')
