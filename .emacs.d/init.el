@@ -8,6 +8,7 @@
 (menu-bar-mode -1)      ; Disable the menu bar
 
 (defvar void/default-font-size 115)
+(defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
 
 ;; Font Config
 (set-face-attribute 'default nil :font "JetBrainsMono NF" :height void/default-font-size)
@@ -16,7 +17,12 @@
 (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono NF" :height void/default-font-size)
 
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height void/default-font-size :weight 'regular)
+(set-face-attribute 'variable-pitch nil 
+                    :font void/my-ui-font 
+                    :height void/default-font-size 
+                    :weight 'regular)
+
+;;(set-face-attribute 'variable-pitch nil :font "Segoe UI" :height void/default-font-size :weight 'regular)
 
 
 ;; Initialize package sources
@@ -222,7 +228,7 @@
 		    (org-level-6 . 1.1)
 		    (org-level-7 . 1.1)
 		    (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))))
+    (set-face-attribute (car face) nil :font void/my-ui-font :weight 'regular :height (cdr face))))
 
 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
 (with-eval-after-load 'org
