@@ -3,9 +3,21 @@
 (scroll-bar-mode -1)    ; Disable visible scrollbar
 (tool-bar-mode -1)      ; Disable the toolbar
 (tooltip-mode -1)       ; Disable the tooltips
-(set-fringe-mode 10)    ; Give some breathing room
+(set-fringe-mode 20)    ; Give some breathing room
 
 (menu-bar-mode -1)      ; Disable the menu bar
+
+(defvar void/default-font-size 115)
+
+;; Font Config
+(set-face-attribute 'default nil :font "JetBrainsMono NF" :height void/default-font-size)
+
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil :font "JetBrainsMono NF" :height void/default-font-size)
+
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height void/default-font-size :weight 'regular)
+
 
 ;; Initialize package sources
 (require 'package)
@@ -154,11 +166,37 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+; TODO: Still need to configure this plugin
+(use-package forge)
+
+(defun void/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (visual-line-mode 1))
+
+(use-package org
+  :hook (org-mode . void/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾")
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+
+  (setq org-agenda-files
+	'("/home/jbenitez/Documents/Super_Temp_Delete_Once_Seen/Tasks.org")))
+
+(use-package org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
 ;; Setting variables
 (keymap-global-set "<escape>" 'keyboard-escape-quit)
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (column-number-mode)
+
 
 (dolist (mode '(org-mode-hook
 		term-mode-hook
@@ -173,3 +211,36 @@
 
 (void/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+;; Set faces for heading levels
+(with-eval-after-load 'org-faces
+    (dolist (face '((org-level-1 . 1.2)
+		    (org-level-2 . 1.1)
+		    (org-level-3 . 1.05)
+		    (org-level-4 . 1.0)
+		    (org-level-5 . 1.1)
+		    (org-level-6 . 1.1)
+		    (org-level-7 . 1.1)
+		    (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "Cantarell" :weight 'regular :height (cdr face))))
+
+;; Ensure that anything that should be fixed-pitch in Org files appears that way
+(with-eval-after-load 'org
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+
+(defun void/org-mode-visual-fill ()
+  (setq visual-fill-column-width 200
+	visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . void/org-mode-visual-fill))
+
+; TODO: Caps Lock(Ctrl) + space + H,J,K,L = arrow keys
+; TODO: Bind ibuffer
