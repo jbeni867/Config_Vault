@@ -9,6 +9,8 @@
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (column-number-mode)
+(setq org-src-fontify-natively t)
+(setq org-src-tab-acts-natively t)
 
 (defvar void/default-font-size 115)
 (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
@@ -42,6 +44,11 @@
           (lambda () 
             (add-hook 'after-save-hook #'void/org-babel-tangle-config nil t)))
 
+(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("py" . "src python"))
+(add-to-list 'org-structure-template-alist '("cs" . "src csharp"))
+
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("org" . "https://orgmode.org/elpa/")
@@ -61,15 +68,6 @@
 		term-mode-hook
 		eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
-
-(defhydra hydra-text-scale (:timeout 6)
-	   "scale text"
-	   ("j" text-scale-increase "in")
-	   ("k" text-scale-decrease "out")
-	   ("f" nil "finished" :exit t))
-
-(void/leader-keys
-  "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 ;; Set faces for heading levels
 (with-eval-after-load 'org-faces
@@ -203,6 +201,15 @@
     (evil-collection-init))
 
   (use-package hydra)
+  (defhydra hydra-text-scale (:timeout 6)
+  	   "scale text"
+  	   ("j" text-scale-increase "in")
+  	   ("k" text-scale-decrease "out")
+  	   ("f" nil "finished" :exit t))
+
+  (void/leader-keys
+    "ts" '(hydra-text-scale/body :which-key "scale text"))
+
 
   (use-package projectile
     :diminish projectile-mode
