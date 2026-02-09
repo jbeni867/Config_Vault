@@ -1,3 +1,9 @@
+#+title Emacs Init Config
+#+property: header-args:emacs-lisp :tangle ./.emacs.d/init.el :mkdirp yes
+
+
+* Quality of Life Improvements
+#+begin_src emacs-lisp
 (setq inhibit-startup-message t)
 (setq ring-bell-function 'ignore)
 (scroll-bar-mode -1)
@@ -9,39 +15,54 @@
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (column-number-mode)
+#+end_src
 
-(defvar void/default-font-size 115)
-(defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
+* Font Config
+#+begin_src emacs-lisp
+  (defvar void/default-font-size 115)
+  (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
 
-;; Font Config
-(set-face-attribute 'default nil :font "JetBrainsMono NF" :height void/default-font-size)
+  ;; Font Config
+  (set-face-attribute 'default nil :font "JetBrainsMono NF" :height void/default-font-size)
 
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "JetBrainsMono NF" :height void/default-font-size)
+  ;; Set the fixed pitch face
+  (set-face-attribute 'fixed-pitch nil :font "JetBrainsMono NF" :height void/default-font-size)
 
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil
-		    :font void/my-ui-font
-		    :height void/default-font-size
-		    :weight 'regular)
+  ;; Set the variable pitch face
+  (set-face-attribute 'variable-pitch nil
+  		    :font void/my-ui-font
+  		    :height void/default-font-size
+  		    :weight 'regular)
+  
+#+end_src
 
-(org-babel-do-load-languages
+* Org Mode
+** Configure Babel Languages
+#+begin_src emacs-lisp
+  (org-babel-do-load-languages
   'org-babel-load-languages
   '((emacs-lisp . t)
     (python . t)))
 
 (setq org-confirm-babel-evaluate nil)
+#+end_src
 
-(defun void/org-babel-tangle-config ()
-  "Automatically tangle the Org file when saved."
-  (when (string-equal (file-name-nondirectory (buffer-file-name)) "Emacs.org")
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
+** Auto-tangle Config File
+#+begin_src emacs-lisp
+  (defun void/org-babel-tangle-config ()
+    "Automatically tangle the Org file when saved."
+    (when (string-equal (file-name-nondirectory (buffer-file-name)) "Emacs.org")
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
 
-(add-hook 'org-mode-hook 
-          (lambda () 
-            (add-hook 'after-save-hook #'void/org-babel-tangle-config nil t)))
+  (add-hook 'org-mode-hook 
+            (lambda () 
+              (add-hook 'after-save-hook #'void/org-babel-tangle-config nil t)))
+#+end_src
 
+* Package Configuration
+** Adding Package Repositories
+#+begin_src emacs-lisp
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
 			 ("org" . "https://orgmode.org/elpa/")
@@ -56,54 +77,61 @@
   (package-install 'use-package))
 (require 'use-package)
 (setq use-package-always-ensure t)
+#+end_src
 
-(dolist (mode '(org-mode-hook
-		term-mode-hook
-		eshell-mode-hook))
-  (add-hook mode(lambda () (display-line-numbers-mode 0))))
+** User Hooks/Functions
+#+begin_src emacs-lisp
+  (dolist (mode '(org-mode-hook
+  		term-mode-hook
+  		eshell-mode-hook))
+    (add-hook mode(lambda () (display-line-numbers-mode 0))))
 
-(defhydra hydra-text-scale (:timeout 6)
-	   "scale text"
-	   ("j" text-scale-increase "in")
-	   ("k" text-scale-decrease "out")
-	   ("f" nil "finished" :exit t))
+  (defhydra hydra-text-scale (:timeout 6)
+  	   "scale text"
+  	   ("j" text-scale-increase "in")
+  	   ("k" text-scale-decrease "out")
+  	   ("f" nil "finished" :exit t))
 
-(void/leader-keys
-  "ts" '(hydra-text-scale/body :which-key "scale text"))
+  (void/leader-keys
+    "ts" '(hydra-text-scale/body :which-key "scale text"))
 
-;; Set faces for heading levels
-(with-eval-after-load 'org-faces
-    (dolist (face '((org-level-1 . 1.2)
-		    (org-level-2 . 1.1)
-		    (org-level-3 . 1.05)
-		    (org-level-4 . 1.0)
-		    (org-level-5 . 1.1)
-		    (org-level-6 . 1.1)
-		    (org-level-7 . 1.1)
-		    (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font void/my-ui-font :weight 'regular :height (cdr face))))
+  ;; Set faces for heading levels
+  (with-eval-after-load 'org-faces
+      (dolist (face '((org-level-1 . 1.2)
+  		    (org-level-2 . 1.1)
+  		    (org-level-3 . 1.05)
+  		    (org-level-4 . 1.0)
+  		    (org-level-5 . 1.1)
+  		    (org-level-6 . 1.1)
+  		    (org-level-7 . 1.1)
+  		    (org-level-8 . 1.1)))
+      (set-face-attribute (car face) nil :font void/my-ui-font :weight 'regular :height (cdr face))))
 
-;; Ensure that anything that should be fixed-pitch in Org files appears that way
-(with-eval-after-load 'org
-    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (with-eval-after-load 'org
+      (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
-(defun void/org-mode-visual-fill ()
-  (setq visual-fill-column-width 200
-	visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
+  (defun void/org-mode-visual-fill ()
+    (setq visual-fill-column-width 200
+  	visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
 
-(defun void/org-mode-setup ()
-  (org-indent-mode)
-  (variable-pitch-mode 1)
-  (visual-line-mode 1))
+  (defun void/org-mode-setup ()
+    (org-indent-mode)
+    (variable-pitch-mode 1)
+    (visual-line-mode 1))
 
-(use-package command-log-mode)
+#+end_src
+
+** Packages
+#+begin_src emacs-lisp
+  (use-package command-log-mode)
 
   (use-package ivy
     :bind (("C-s" . swiper)
@@ -244,3 +272,4 @@
 
 (use-package visual-fill-column
   :hook (org-mode . void/org-mode-visual-fill))
+#+end_src
