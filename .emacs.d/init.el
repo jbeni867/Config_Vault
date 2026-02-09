@@ -9,8 +9,6 @@
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (column-number-mode)
-(setq org-src-fontify-natively t)
-(setq org-src-tab-acts-natively t)
 
 (defvar void/default-font-size 115)
 (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
@@ -43,11 +41,6 @@
 (add-hook 'org-mode-hook 
           (lambda () 
             (add-hook 'after-save-hook #'void/org-babel-tangle-config nil t)))
-
-(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-(add-to-list 'org-structure-template-alist '("py" . "src python"))
-(add-to-list 'org-structure-template-alist '("cs" . "src csharp"))
 
 (require 'package)
 (setq package-archives '(("melpa" . "https://melpa.org/packages/")
@@ -239,6 +232,14 @@
     (setq org-agenda-start-with-log-mode t)
     (setq org-log-done 'time)
     (setq org-log-into-drawer t)
+
+    (require 'org-temp)
+    (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+    (add-to-list 'org-structure-template-alist '("py" . "src python"))
+    (add-to-list 'org-structure-template-alist '("cs" . "src csharp"))
+    (setq org-src-fontify-natively t)
+    (setq org-src-tab-acts-natively t)
 
     (setq org-agenda-files
   	'("/home/jbenitez/Documents/Super_Temp_Delete_Once_Seen/Tasks.org")))
