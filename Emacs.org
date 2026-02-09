@@ -261,7 +261,7 @@
       (setq org-log-done 'time)
       (setq org-log-into-drawer t)
 
-      (require 'org-temp)
+      (require 'org-tempo)
       (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
       (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
       (add-to-list 'org-structure-template-alist '("py" . "src python"))
@@ -269,8 +269,8 @@
       (setq org-src-fontify-natively t)
       (setq org-src-tab-acts-natively t)
 
-      (setq org-agenda-files
-    	'("/home/jbenitez/Documents/Super_Temp_Delete_Once_Seen/Tasks.org")))
+      ;(setq org-agenda-files
+    	;'("/home/jbenitez/Documents/Super_Temp_Delete_Once_Seen/Tasks.org")))
 
     (use-package org-bullets
       :after org
