@@ -96,153 +96,150 @@
 
 (use-package command-log-mode)
 
-  (use-package ivy
-    :bind (("C-s" . swiper)
-           :map ivy-minibuffer-map
-           ("TAB" . ivy-alt-done)	
-           ("C-l" . ivy-alt-done)
-           ("C-j" . ivy-next-line)
-           ("C-k" . ivy-previous-line)
-           :map ivy-switch-buffer-map
-           ("C-k" . ivy-previous-line)
-           ("C-l" . ivy-done)
-           ("C-d" . ivy-switch-buffer-kill)
-           :map ivy-reverse-i-search-map
-           ("C-k" . ivy-previous-line)
-           ("C-d" . ivy-reverse-i-search-kill))
-    :config
-    (ivy-mode 1))
+(use-package ivy
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)	
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
 
-  (use-package counsel
-    :bind (("M-x" . counsel-M-x)
-  	 ("C-x b" . counsel-ibuffer)
-  	 ("C-x C-f" . counsel-find-file)
-  	 :map minibuffer-local-map
-  	 ("C-r" . 'counsel-minibuffer-history))
-    :config
-    (setq ivy-initial-inputs-alist nil))
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+	 ("C-x b" . counsel-ibuffer)
+	 ("C-x C-f" . counsel-find-file)
+	 :map minibuffer-local-map
+	 ("C-r" . 'counsel-minibuffer-history))
+  :config
+  (setq ivy-initial-inputs-alist nil))
 
-  (use-package doom-modeline
-    :ensure t
-    :init (doom-modeline-mode 1)
-    :custom ((doom-modeline-height 15)))
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 
-  (use-package all-the-icons)
+(use-package all-the-icons)
 
-  (use-package rainbow-delimiters
-    :hook (prog-mode . rainbow-delimiters-mode))
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
-  (use-package which-key
-    :init (which-key-mode)
-    :diminish which-key-mode
-    :config
-    (setq which-key-idle-delay 0.2))
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.2))
 
-  (use-package ivy-rich
-    :init
-    (ivy-rich-mode 1))
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
 
-  (use-package helpful
-    :custom
-    (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-variable)
-    :bind
-    ([remap describe-function] . counsel-describe-function)
-    ([remap describe-command] . helpful-command)
-    ([remap describe-variable] . counsel-describe-variable)
-    ([remap describe-key] . helpful-key))
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
 
-  (use-package doom-themes
-    :config
-    (load-theme 'doom-one t))
+(use-package doom-themes
+  :config
+  (load-theme 'doom-one t))
 
-  (use-package general
-    :ensure t
-    :init
-    (general-create-definer void/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC")
-    :config
-    (void/leader-keys
-      "t"  '(:ignore t :which-key "toggles")
-      "tt" '(counsel-load-theme :which-key "choose theme")))
-
-  (use-package evil
-    :ensure t
-    :demand t
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    :hook (evil-mode . void/evil-hook)
-    :config
-    (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-    ; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal)
-    :custom ((evil-undo-system 'undo-redo)))
-
-  (use-package evil-collection
-    :after evil
-    :config
-    (evil-collection-init))
-
-  (use-package hydra)
-  (defhydra hydra-text-scale (:timeout 6)
-  	   "scale text"
-  	   ("j" text-scale-increase "in")
-  	   ("k" text-scale-decrease "out")
-  	   ("f" nil "finished" :exit t))
-
+(use-package general
+  :ensure t
+  :init
+  (general-create-definer void/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
+  :config
   (void/leader-keys
-    "ts" '(hydra-text-scale/body :which-key "scale text"))
+    "t"  '(:ignore t :which-key "toggles")
+    "tt" '(counsel-load-theme :which-key "choose theme")))
+
+(use-package evil
+  :ensure t
+  :demand t
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  :hook (evil-mode . void/evil-hook)
+  :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+  ; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal)
+  :custom ((evil-undo-system 'undo-redo)))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+(use-package hydra)
+(defhydra hydra-text-scale (:timeout 6)
+	   "scale text"
+	   ("j" text-scale-increase "in")
+	   ("k" text-scale-decrease "out")
+	   ("f" nil "finished" :exit t))
+
+(void/leader-keys
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
 
 
-  (use-package projectile
-    :diminish projectile-mode
-    :config (projectile-mode)
-    :custom ((projectile-completion-system 'ivy))
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
-    :init
-    (when (file-directory-p "~/Development")
-      (setq projectile-project-search-path '("~/Development")))
-    (setq projectile-switch-project-action #'projectile-dired))
-  ; TODO: Add info about <M-o> giving more info on additional operations
-  (use-package counsel-projectile
-    :config (counsel-projectile-mode))
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (when (file-directory-p "~/Development")
+    (setq projectile-project-search-path '("~/Development")))
+  (setq projectile-switch-project-action #'projectile-dired))
+; TODO: Add info about <M-o> giving more info on additional operations
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
 
-  (use-package magit
-    :custom
-    (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-  ; TODO: Still need to configure this plugin
-  (use-package forge)
+; TODO: Still need to configure this plugin
+(use-package forge)
 
-  (use-package org
-    :hook (org-mode . void/org-mode-setup)
-    :config
-    (setq org-ellipsis " ▾")
-    (setq org-agenda-start-with-log-mode t)
-    (setq org-log-done 'time)
-    (setq org-log-into-drawer t)
+(use-package org
+  :hook (org-mode . void/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾")
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
 
-    (require 'org-tempo)
-    (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
-    (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-    (add-to-list 'org-structure-template-alist '("py" . "src python"))
-    (add-to-list 'org-structure-template-alist '("cs" . "src csharp"))
-    (setq org-src-fontify-natively t)
-    (setq org-src-tab-acts-natively t)
-
-    ;(setq org-agenda-files
-  	;'("/home/jbenitez/Documents/Super_Temp_Delete_Once_Seen/Tasks.org")))
+  (require 'org-tempo)
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python"))
+  (add-to-list 'org-structure-template-alist '("cs" . "src csharp"))
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
 
   (use-package org-bullets
     :after org
@@ -250,5 +247,5 @@
     :custom
     (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(use-package visual-fill-column
-  :hook (org-mode . void/org-mode-visual-fill))
+  (use-package visual-fill-column
+    :hook (org-mode . void/org-mode-visual-fill)))
