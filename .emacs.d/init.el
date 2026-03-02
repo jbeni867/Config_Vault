@@ -99,6 +99,11 @@
   (variable-pitch-mode 1)
   (visual-line-mode 1))
 
+(use-package atom-one-dark-theme
+  :ensure t
+  :config
+  (load-theme 'atom-one-dark t))
+
 (use-package command-log-mode)
 
 (use-package ivy
@@ -211,6 +216,8 @@
 (void/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
+(use-package ivy-hydra
+  :after (ivy hydra))
 
 (use-package projectile
   :diminish projectile-mode
