@@ -125,6 +125,14 @@
   
 #+end_src
 
+** Aesthetics/Theme
+#+begin_src emacs-lisp
+  (use-package atom-one-dark-theme
+    :ensure t
+    :config
+    (load-theme 'atom-one-dark t))
+#+end_src
+
 ** Packages
 #+begin_src emacs-lisp
   (use-package command-log-mode)
@@ -239,6 +247,8 @@
   (void/leader-keys
     "ts" '(hydra-text-scale/body :which-key "scale text"))
 
+  (use-package ivy-hydra
+    :after (ivy hydra))
 
   (use-package projectile
     :diminish projectile-mode
