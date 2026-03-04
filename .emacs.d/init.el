@@ -162,9 +162,7 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 
-(use-package doom-themes
-  :config
-  (load-theme 'doom-one t))
+(use-package doom-themes)
 
 (use-package general
   :ensure t
@@ -265,6 +263,8 @@
   (use-package visual-fill-column
     :hook (org-mode . void/org-mode-visual-fill)))
 
+(use-package csproj-mode)
+
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init (setq lsp-keymap-prefix "SPC l")
@@ -328,3 +328,19 @@
   :config
   (void/leader-keys
     "kc" '(evilnc-comment-or-uncomment-lines :which-key "comment lines")))
+
+(if (eq system-type 'windows-nt)
+    (progn
+      ;; Windows setup: Use PowerShell Core (pwsh)
+      (setq explicit-shell-file-name "pwsh")
+      (setq explicit-pwsh-args '("-NoLogo"))
+      
+      ;; Set pwsh for background shell commands
+      (setq shell-file-name "pwsh")
+      (setq shell-command-switch "-Command"))
+      
+  ;; Non-Windows setup (Linux/macOS fallback)
+  (progn
+    (setq explicit-shell-file-name "/bin/bash")
+    (setq shell-file-name "/bin/bash")
+    (setq shell-command-switch "-c")))

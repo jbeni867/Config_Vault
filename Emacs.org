@@ -193,9 +193,7 @@
     ([remap describe-variable] . counsel-describe-variable)
     ([remap describe-key] . helpful-key))
 
-  (use-package doom-themes
-    :config
-    (load-theme 'doom-one t))
+  (use-package doom-themes)
 
   (use-package general
     :ensure t
@@ -295,6 +293,8 @@
     
     (use-package visual-fill-column
       :hook (org-mode . void/org-mode-visual-fill)))
+
+  (use-package csproj-mode)
 #+end_src
 
 * Languages
@@ -384,4 +384,23 @@
     :config
     (void/leader-keys
       "kc" '(evilnc-comment-or-uncomment-lines :which-key "comment lines")))
+#+end_src
+
+* Terminal
+#+begin_src emacs-lisp
+  (if (eq system-type 'windows-nt)
+      (progn
+        ;; Windows setup: Use PowerShell Core (pwsh)
+        (setq explicit-shell-file-name "pwsh")
+        (setq explicit-pwsh-args '("-NoLogo"))
+        
+        ;; Set pwsh for background shell commands
+        (setq shell-file-name "pwsh")
+        (setq shell-command-switch "-Command"))
+        
+    ;; Non-Windows setup (Linux/macOS fallback)
+    (progn
+      (setq explicit-shell-file-name "/bin/bash")
+      (setq shell-file-name "/bin/bash")
+      (setq shell-command-switch "-c")))
 #+end_src
