@@ -325,7 +325,7 @@
 
 (use-package evil-nerd-commenter
   :bind ("M-/" . evilnc-comment-or-uncomment-lines)
-  :config
+  :init
   (void/leader-keys
     "kc" '(evilnc-comment-or-uncomment-lines :which-key "comment lines")))
 
