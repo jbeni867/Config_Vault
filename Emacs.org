@@ -4,22 +4,28 @@
 
 * Quality of Life Improvements
 #+begin_src emacs-lisp
-  (setq inhibit-startup-message t)
-  (setq ring-bell-function 'ignore)
-  (scroll-bar-mode -1)
-  (tool-bar-mode -1)
-  (tooltip-mode -1)
-  (set-fringe-mode 20)
-  (menu-bar-mode -1)
-  (keymap-global-set "<escape>" 'keyboard-escape-quit)
-  (global-display-line-numbers-mode t)
-  (setq display-line-numbers-type 'relative)
-  (column-number-mode)
+    (setq inhibit-startup-message t)
+    (setq ring-bell-function 'ignore)
+    (scroll-bar-mode -1)
+    (tool-bar-mode -1)
+    (tooltip-mode -1)
+    (set-fringe-mode 20)
+    (menu-bar-mode -1)
+    (keymap-global-set "<escape>" 'keyboard-escape-quit)
+    (global-display-line-numbers-mode t)
+    (setq display-line-numbers-type 'relative)
+    (column-number-mode)
 
-  (set-default-coding-systems 'utf-8)
-  (prefer-coding-system 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
+    (set-default-coding-systems 'utf-8)
+    (prefer-coding-system 'utf-8)
+    (set-terminal-coding-system 'utf-8)
+    (set-keyboard-coding-system 'utf-8)
+
+    ;; Increase how much data Emacs reads from the LSP process to 1MB
+    (setq read-process-output-max (* 1024 1024))
+  
+    ;; Increase the garbage collection threshold to 100MB to prevent stuttering
+    (setq gc-cons-threshold 100000000)
 #+end_src
 
 * Font Config
@@ -200,7 +206,7 @@
     :after (evil which-key)
     :config
     (general-create-definer void/leader-keys
-      :keymaps '(normal insert visual emacs)
+      :keymaps '(normal visual emacs)
       :prefix "SPC"
       :global-prefix "C-SPC")
     
@@ -300,14 +306,20 @@
 * Languages
 ** Language Servers
 #+begin_src emacs-lisp
+  (setenv "LSP_USE_PLISTS" "true")
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
     :init (setq lsp-keymap-prefix "SPC l")
     :hook (
-  	 (csharp-mode . lsp-deferred)
-  	 (web-mode . lsp-deferred)
-  	 (python-mode . lsp-deferred)
-  	 (js-mode . lsp-deferred))
+    	 (csharp-mode . lsp-deferred)
+    	 (web-mode . lsp-deferred)
+    	 (python-mode . lsp-deferred)
+    	 (js-mode . lsp-deferred))
+    :custom
+    (lsp-enable-snippet t)                   ; Ensure snippet support is on
+    (lsp-completion-provider :capf)          ; Use the standard completion API
+    (lsp-completion-show-detail t)           ; Force Roslyn to fetch docs/details
+    (lsp-completion-show-kind t)             ; Show icons in the autocomplete menu
     :config
     (lsp-enable-which-key-integration t)
     (void/leader-keys
@@ -338,8 +350,8 @@
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.1))
 
-  (use-package company-box
-    :hook (company-mode . company-box-mode))
+  ;; (use-package company-box
+  ;;   :hook (company-mode . company-box-mode))
 #+end_src
 
 ** Better LSP UI
@@ -386,21 +398,31 @@
       "kc" '(evilnc-comment-or-uncomment-lines :which-key "comment lines")))
 #+end_src
 
+** Better Snippets with yasnippet
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config
+    (yas-global-mode 1))
+#+end_src
+
+#+RESULTS:
+
 * Terminal
 #+begin_src emacs-lisp
-  (if (eq system-type 'windows-nt)
-      (progn
-        ;; Windows setup: Use PowerShell Core (pwsh)
-        (setq explicit-shell-file-name "pwsh")
-        (setq explicit-pwsh-args '("-NoLogo"))
+  ;; (if (eq system-type 'windows-nt)
+  ;;     (progn
+  ;;       ;; Windows setup: Use PowerShell Core (pwsh)
+  ;;       (setq explicit-shell-file-name "powershell")
+  ;;       (setq explicit-powershell-args '("-NoLogo"))
         
-        ;; Set pwsh for background shell commands
-        (setq shell-file-name "pwsh")
-        (setq shell-command-switch "-Command"))
+  ;;       ;; Set pwsh for background shell commands
+  ;;       (setq shell-file-name "powershell")
+  ;;       (setq shell-command-switch "-Command"))
         
-    ;; Non-Windows setup (Linux/macOS fallback)
-    (progn
-      (setq explicit-shell-file-name "/bin/bash")
-      (setq shell-file-name "/bin/bash")
-      (setq shell-command-switch "-c")))
+  ;;   ;; Non-Windows setup (Linux/macOS fallback)
+  ;;   (progn
+  ;;     (setq explicit-shell-file-name "/bin/bash")
+  ;;     (setq shell-file-name "/bin/bash")
+  ;;     (setq shell-command-switch "-c")))
 #+end_src

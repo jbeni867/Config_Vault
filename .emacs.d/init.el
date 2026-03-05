@@ -15,6 +15,12 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
+;; Increase how much data Emacs reads from the LSP process to 1MB
+(setq read-process-output-max (* 1024 1024))
+
+;; Increase the garbage collection threshold to 100MB to prevent stuttering
+(setq gc-cons-threshold 100000000)
+
 (defvar void/default-font-size 115)
 (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
 
@@ -169,7 +175,7 @@
   :after (evil which-key)
   :config
   (general-create-definer void/leader-keys
-    :keymaps '(normal insert visual emacs)
+    :keymaps '(normal visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
   
@@ -265,14 +271,20 @@
 
 (use-package csproj-mode)
 
+(setenv "LSP_USE_PLISTS" "true")
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init (setq lsp-keymap-prefix "SPC l")
   :hook (
-	 (csharp-mode . lsp-deferred)
-	 (web-mode . lsp-deferred)
-	 (python-mode . lsp-deferred)
-	 (js-mode . lsp-deferred))
+  	 (csharp-mode . lsp-deferred)
+  	 (web-mode . lsp-deferred)
+  	 (python-mode . lsp-deferred)
+  	 (js-mode . lsp-deferred))
+  :custom
+  (lsp-enable-snippet t)                   ; Ensure snippet support is on
+  (lsp-completion-provider :capf)          ; Use the standard completion API
+  (lsp-completion-show-detail t)           ; Force Roslyn to fetch docs/details
+  (lsp-completion-show-kind t)             ; Show icons in the autocomplete menu
   :config
   (lsp-enable-which-key-integration t)
   (void/leader-keys
@@ -297,8 +309,8 @@
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.1))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode))
 
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
@@ -329,18 +341,23 @@
   (void/leader-keys
     "kc" '(evilnc-comment-or-uncomment-lines :which-key "comment lines")))
 
-(if (eq system-type 'windows-nt)
-    (progn
-      ;; Windows setup: Use PowerShell Core (pwsh)
-      (setq explicit-shell-file-name "pwsh")
-      (setq explicit-pwsh-args '("-NoLogo"))
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode 1))
+
+;; (if (eq system-type 'windows-nt)
+;;     (progn
+;;       ;; Windows setup: Use PowerShell Core (pwsh)
+;;       (setq explicit-shell-file-name "powershell")
+;;       (setq explicit-powershell-args '("-NoLogo"))
       
-      ;; Set pwsh for background shell commands
-      (setq shell-file-name "pwsh")
-      (setq shell-command-switch "-Command"))
+;;       ;; Set pwsh for background shell commands
+;;       (setq shell-file-name "powershell")
+;;       (setq shell-command-switch "-Command"))
       
-  ;; Non-Windows setup (Linux/macOS fallback)
-  (progn
-    (setq explicit-shell-file-name "/bin/bash")
-    (setq shell-file-name "/bin/bash")
-    (setq shell-command-switch "-c")))
+;;   ;; Non-Windows setup (Linux/macOS fallback)
+;;   (progn
+;;     (setq explicit-shell-file-name "/bin/bash")
+;;     (setq shell-file-name "/bin/bash")
+;;     (setq shell-command-switch "-c")))
