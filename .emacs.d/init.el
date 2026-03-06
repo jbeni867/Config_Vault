@@ -270,6 +270,10 @@
     :hook (org-mode . void/org-mode-visual-fill)))
 
 (use-package csproj-mode)
+(use-package sharper
+  :demand t
+  :bind
+  ("C-c n" . sharper-main-transient))
 
 (setenv "LSP_USE_PLISTS" "true")
 (use-package lsp-mode
