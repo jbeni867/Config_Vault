@@ -175,7 +175,7 @@
   :after (evil which-key)
   :config
   (general-create-definer void/leader-keys
-    :keymaps '(normal visual emacs)
+    :keymaps '(normal visual)
     :prefix "SPC"
     :global-prefix "C-SPC")
   
@@ -275,7 +275,7 @@
   :bind
   ("C-c n" . sharper-main-transient))
 
-(setenv "LSP_USE_PLISTS" "true")
+;; (setenv "LSP_USE_PLISTS" "true")
 (use-package lsp-mode
   :commands (lsp lsp-deferred)
   :init (setq lsp-keymap-prefix "SPC l")
@@ -291,6 +291,9 @@
   (lsp-completion-show-kind t)             ; Show icons in the autocomplete menu
   :config
   (lsp-enable-which-key-integration t)
+
+  (define-key lsp-mode-map (kbd "SPC l") nil)
+
   (void/leader-keys
     "l" '(:keymap lsp-command-map :which-key "lsp")))
 
