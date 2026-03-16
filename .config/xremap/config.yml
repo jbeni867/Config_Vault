@@ -1,0 +1,18 @@
+# 1 & 2. Global Remap: Caps Lock to Control
+modmap:
+  - name: Global Modmap
+    remap:
+      CapsLock: Ctrl_L
+
+keymap:
+  # 3. Emergency Toggle: Shift + F1
+  - name: Toggle CapsLock state
+    remap:
+      Shift-F1: CapsLock
+
+  # 4 & 5. Conditional Hotkey: Ctrl+G to Escape (Excluding Emacs and Rider)
+  - name: Ctrl+G to Esc conditionally
+    application:
+      not: [Emacs, jetbrains-rider] # You can verify the exact window class names using your DE tools
+    remap:
+      Ctrl-g: Esc
