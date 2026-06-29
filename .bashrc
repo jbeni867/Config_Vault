@@ -198,3 +198,15 @@ eval "$(pyenv virtualenv-init -)"
 #         echo "Compilation failed."
 #     fi
 # }
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/jbenitez/.local/bin:$PATH"
+
+function md() {
+  pandoc $1 > /tmp/$1.html
+  xdg-open /tmp/$1.html
+}
+
+# Adding Dotnet
+export PATH="/home/jbenitez/.dotnet/tools:$PATH"

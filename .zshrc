@@ -45,3 +45,7 @@ function gccodin() {
     fi
 }
 
+
+
+# Added by Antigravity CLI installer
+export PATH="/home/jbenitez/.local/bin:$PATH"
