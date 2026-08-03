@@ -313,12 +313,13 @@
   ;; (setenv "LSP_USE_PLISTS" "true")
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
-    :init (setq lsp-keymap-prefix "SPC l")
+    ;; :init (setq lsp-keymap-prefix "SPC l")
     :hook (
     	 (csharp-mode . lsp-deferred)
     	 (web-mode . lsp-deferred)
     	 (python-mode . lsp-deferred)
-    	 (js-mode . lsp-deferred))
+    	 (js-mode . lsp-deferred)
+       (lsp-mode . lsp-enable-which-key-integration))
     :custom
     (lsp-enable-snippet t)                   ; Ensure snippet support is on
     (lsp-completion-provider :capf)          ; Use the standard completion API
