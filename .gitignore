@@ -3,3 +3,10 @@
 
 .local/share/fonts/*
 !.local/share/fonts/JetBrainsMono/
+
+.DS_Store
+.emacs.d/elpa/
+.emacs.d/forge-database.sqlite
+.emacs.d/projectile-bookmarks.eld
+.emacs.d/projectile-frecency.eld
+.emacs.d/transient/
