@@ -3,8 +3,11 @@
 #   exec tmux
 # fi
 
+export BUN_INSTALL="$HOME/.bun"
+
 # Setting path varibale to include additional folders
-export PATH=$PATH:$HOME/.spicetify:$HOME/.dotnet/tools:$HOME/.emacs.d/bin:$HOME/bin:/Users/jordy/.local/bin:/usr/local/opt/tcl-tk/bin
+export PATH=$PATH:$HOME/.spicetify:$HOME/.dotnet/tools:$HOME/.emacs.d/bin:$HOME/bin:/Users/jordy/.local/bin:/usr/local/opt/tcl-tk/bin:$BUN_INSTALL/bin:$PATH
+
 export DOOMDIR=$HOME/.config/doom/
 
 # Setting default editor for terminal
@@ -16,6 +19,7 @@ alias nv='nvim'
 alias nvfzf='nvim $(fzf --preview="bat --style=numbers --color=always {}")'
 
 alias odin='ssh jordybenitez@odin.unomaha.edu'
+alias firefoxdev='/Applications/Firefox.app/Contents/MacOS/firefox -start-debugger-server'
 
 # Setting up pyenv
 export PYENV_ROOT="$HOME/.pyenv"
