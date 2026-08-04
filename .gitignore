@@ -10,3 +10,4 @@
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/projectile-frecency.eld
 .emacs.d/transient/
+.emacs.d/local.el

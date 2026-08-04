@@ -305,21 +305,69 @@
     :demand t
     :bind
     ("C-c n" . sharper-main-transient))
+
+  (use-package typescript-mode)
+  (use-package web-mode
+    :mode "\\.html?\\'")
+  ;; scss-mode still registers legacy Flymake variables at load time.
+  ;; Define them only when absent; SCSS compilation remains disabled.
+  (defvar flymake-allowed-file-name-masks nil)
+  (defvar flymake-err-line-patterns nil)
+  (use-package scss-mode
+    :custom
+    (scss-compile-at-save nil))
 #+end_src
 
 * Languages
+** Language Modes
+#+begin_src emacs-lisp
+  (defun void/treesit-language-ready-p (language)
+    "Return non-nil when LANGUAGE has a usable tree-sitter grammar."
+    (and (fboundp 'treesit-available-p)
+         (treesit-available-p)
+         (treesit-language-available-p language)))
+
+  (when (void/treesit-language-ready-p 'typescript)
+    (add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode)))
+  (when (void/treesit-language-ready-p 'tsx)
+    (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode)))
+  (when (void/treesit-language-ready-p 'c-sharp)
+    (add-to-list 'auto-mode-alist '("\\.cs\\'" . csharp-ts-mode)))
+  (when (void/treesit-language-ready-p 'css)
+    (add-to-list 'auto-mode-alist '("\\.css\\'" . css-ts-mode)))
+
+  (defun void/angular-project-p (&optional directory)
+    "Return non-nil when DIRECTORY belongs to an Angular project."
+    (locate-dominating-file (or directory default-directory) "angular.json"))
+
+  (defun void/web-mode-setup-angular-template ()
+    "Enable Angular template editing for HTML files in Angular projects."
+    (when (and buffer-file-name
+               (void/angular-project-p (file-name-directory buffer-file-name)))
+      (web-mode-set-engine "angular")))
+
+  (add-hook 'web-mode-hook #'void/web-mode-setup-angular-template)
+#+end_src
+
 ** Language Servers
 #+begin_src emacs-lisp
+  ;; External language servers: typescript-language-server, ngserver,
+  ;; vscode-html-language-server, and vscode-css-language-server.
   ;; (setenv "LSP_USE_PLISTS" "true")
   (use-package lsp-mode
     :commands (lsp lsp-deferred)
     ;; :init (setq lsp-keymap-prefix "SPC l")
-    :hook (
-    	 (csharp-mode . lsp-deferred)
-    	 (web-mode . lsp-deferred)
-    	 (python-mode . lsp-deferred)
-    	 (js-mode . lsp-deferred)
-       (lsp-mode . lsp-enable-which-key-integration))
+    :hook ((csharp-mode . lsp-deferred)
+           (csharp-ts-mode . lsp-deferred)
+           (web-mode . lsp-deferred)
+           (typescript-mode . lsp-deferred)
+           (typescript-ts-mode . lsp-deferred)
+           (tsx-ts-mode . lsp-deferred)
+           (python-mode . lsp-deferred)
+            (js-mode . lsp-deferred)
+            (css-mode . lsp-deferred)
+            (css-ts-mode . lsp-deferred)
+           (lsp-mode . lsp-enable-which-key-integration))
     :custom
     (lsp-enable-snippet t)                   ; Ensure snippet support is on
     (lsp-completion-provider :capf)          ; Use the standard completion API
@@ -328,10 +376,278 @@
     :config
     (lsp-enable-which-key-integration t)
 
+     (with-eval-after-load 'lsp-javascript
+       (setq lsp-clients-typescript-prefer-use-project-ts-server t))
+
+     ;; MSSQL is loaded explicitly by `void/lsp-mssql-deferred' for SQL buffers.
+     (setq lsp-client-packages (delq 'lsp-mssql lsp-client-packages))
+
+     ;; Prefer lsp-mssql over the retained postgres-ls fallback for SQL buffers.
+    (add-to-list 'lsp-disabled-clients '(sql-mode sql-ls sqls))
+
     (define-key lsp-mode-map (kbd "SPC l") nil)
 
-    (void/leader-keys
-      "l" '(:keymap lsp-command-map :which-key "lsp")))
+   (void/leader-keys
+     "l" '(:keymap lsp-command-map :which-key "lsp")))
+#+end_src
+
+** MSSQL and SQL Client
+#+begin_src emacs-lisp
+  ;; SQLToolsService is downloaded on demand. sqlcmd is also required for
+  ;; `void/sql-ms'.
+  (defconst void/lsp-mssql-sqltoolsservice-version "6.0.20260731.1")
+  (defconst void/lsp-mssql-sqltoolsservice-checksums
+    '(("Microsoft.SqlTools.ServiceLayer-linux-arm64-net10.0.tar.gz" . "221a5ccbe9e7f81c4b920da40b3f6264d0df16d650e70a4dc7cc727b89e20ffd")
+      ("Microsoft.SqlTools.ServiceLayer-linux-x64-net10.0.tar.gz" . "cf1ea0041de66079841a6bf7d76a3ce40679454acf4dfedd301a71d672b75d9a")
+      ("Microsoft.SqlTools.ServiceLayer-osx-arm64-net10.0.tar.gz" . "576577b5f02db8fa5aea4593519116a9a056b15b88254b7ce2534c03554d512d")
+      ("Microsoft.SqlTools.ServiceLayer-osx-x64-net10.0.tar.gz" . "2d4880d50671df4a96311fcb767d7b552180dc3147d2f26cdda2e5cabfd794c2")
+      ("Microsoft.SqlTools.ServiceLayer-win-arm64-net10.0.zip" . "ab4e69b9b293cb060cea04e0dc1d8295e9cbfc481f7a49027962a4ebb89e558f")
+      ("Microsoft.SqlTools.ServiceLayer-win-x64-net10.0.zip" . "0f10c2f91b85fffb87d69036613860bcd9ab24b699142802d603b79c7c901eda")
+      ("Microsoft.SqlTools.ServiceLayer-win-x86-net10.0.zip" . "418e7c241059404266c1e1d527c9a20e74effe13429ddeebfbd7a942e5e4d481")))
+  (defconst void/lsp-mssql-install-marker ".sqltoolsservice-version")
+
+  ;; Set this before lsp-mssql loads so it never selects the obsolete directory.
+  (setq lsp-mssql-download-location
+        (expand-file-name (format "mssql/%s/" void/lsp-mssql-sqltoolsservice-version)
+                          user-emacs-directory))
+
+  (defun void/lsp-mssql-deferred ()
+    "Load the MSSQL client before starting LSP in a SQL buffer."
+    (require 'lsp-mssql)
+    (lsp-deferred))
+
+  (add-hook 'sql-mode-hook #'void/lsp-mssql-deferred)
+
+  (use-package lsp-mssql
+    :defer t
+    :config
+    ;; lsp-mssql still defaults to an obsolete .NET Core 2.2 server release.
+    ;; Keep the package untouched and use a current, pinned SQLToolsService.
+    (defun void/lsp-mssql-server-archive ()
+      "Return the SQLToolsService archive for this operating system."
+      (let ((architecture (cond
+                           ((string-match-p "aarch64\\|arm64" system-configuration) "arm64")
+                           ((string-match-p "x86_64\\|amd64" system-configuration) "x64")
+                           ((and (eq system-type 'windows-nt)
+                                 (string-match-p "i[3-6]86" system-configuration)) "x86")
+                           (t (user-error "Unsupported SQLToolsService architecture: %s"
+                                          system-configuration))))
+            (platform (pcase system-type
+                        ('gnu/linux "linux")
+                        ('darwin "osx")
+                        ('windows-nt "win")
+                        (_ (user-error "Unsupported SQLToolsService platform: %s"
+                                       system-type)))))
+        (format "Microsoft.SqlTools.ServiceLayer-%s-%s-net10.0.%s"
+                platform architecture (if (eq system-type 'windows-nt) "zip" "tar.gz"))))
+
+    (defun void/lsp-mssql-launcher-present-p (directory)
+      "Return non-nil when DIRECTORY contains the SQLToolsService launcher."
+      (let ((launcher (expand-file-name "MicrosoftSqlToolsServiceLayer" directory)))
+        (or (file-executable-p launcher)
+            (and (eq system-type 'windows-nt)
+                 (file-exists-p (concat launcher ".exe"))))))
+
+    (defun void/lsp-mssql-server-present-p (directory)
+      "Return non-nil when DIRECTORY contains this completed server archive."
+      (let ((marker (expand-file-name void/lsp-mssql-install-marker directory)))
+        (and (void/lsp-mssql-launcher-present-p directory)
+             (file-readable-p marker)
+             (string-equal
+              (with-temp-buffer
+                (insert-file-contents marker)
+                (string-trim (buffer-string)))
+              (concat void/lsp-mssql-sqltoolsservice-version "\n"
+                      (void/lsp-mssql-server-archive))))))
+
+    (defun void/lsp-mssql-archive-sha256 (file)
+      "Return the SHA-256 digest of FILE's literal bytes."
+      (with-temp-buffer
+        (set-buffer-multibyte nil)
+        (insert-file-contents-literally file)
+        (secure-hash 'sha256 (current-buffer))))
+
+    (defun void/lsp-mssql-extract (archive target-directory)
+      "Extract verified ARCHIVE into TARGET-DIRECTORY safely."
+      (pcase system-type
+        ('windows-nt
+         (let ((process-environment (copy-sequence process-environment)))
+           (setenv "SQLTOOLS_ARCHIVE" archive)
+           (setenv "SQLTOOLS_DESTINATION" target-directory)
+           (call-process "powershell" nil nil t
+                         "-NoProfile" "-NonInteractive" "-Command"
+                         (concat "Add-Type -AssemblyName System.IO.Compression.FileSystem;"
+                                 "[IO.Compression.ZipFile]::ExtractToDirectory("
+                                 "$env:SQLTOOLS_ARCHIVE, $env:SQLTOOLS_DESTINATION)"))))
+        ((or 'gnu/linux 'darwin)
+         (call-process "tar" nil nil t "xf" archive "-C" target-directory))
+        (_ (error "Unsupported SQLToolsService platform: %s" system-type))))
+
+    (defun void/lsp-mssql-server-command ()
+      "Return the verified SQLToolsService command, installing it if requested."
+      (let ((server (expand-file-name "MicrosoftSqlToolsServiceLayer"
+                                      lsp-mssql-download-location)))
+        (unless (void/lsp-mssql-server-present-p lsp-mssql-download-location)
+          (unless (y-or-n-p "SQLToolsService is not installed. Download it? ")
+            (user-error "SQLToolsService is not installed"))
+          (lsp-mssql-download-server)
+          (unless (void/lsp-mssql-server-present-p lsp-mssql-download-location)
+            (error "SQLToolsService installation did not complete")))
+        (list server)))
+
+    (defun void/lsp-mssql-download-server ()
+      "Download a current SQLToolsService release for `lsp-mssql'."
+      (interactive)
+      (let* ((archive (void/lsp-mssql-server-archive))
+             (expected-checksum
+              (alist-get archive void/lsp-mssql-sqltoolsservice-checksums nil nil #'string=))
+             (url (format "https://github.com/microsoft/sqltoolsservice/releases/download/%s/%s"
+                          void/lsp-mssql-sqltoolsservice-version archive))
+             (install-directory (directory-file-name lsp-mssql-download-location))
+             (install-parent (file-name-directory install-directory))
+             download-location staging-directory backup-directory)
+        (unless expected-checksum
+          (error "No SHA-256 is pinned for SQLToolsService archive %s" archive))
+        (unwind-protect
+            (progn
+              (make-directory install-parent t)
+              (setq download-location
+                    (make-temp-file "sqltoolsservice-" nil (concat "-" archive)))
+              ;; A sibling staging directory keeps the final rename atomic.
+              (setq staging-directory
+                    (make-temp-file (expand-file-name ".sqltoolsservice-staging-" install-parent) t))
+              (lsp--info "Downloading SQLToolsService from %s" url)
+              (url-copy-file url download-location t)
+              (let ((actual-checksum (void/lsp-mssql-archive-sha256 download-location)))
+                (unless (string-equal actual-checksum expected-checksum)
+                  (error "SQLToolsService checksum mismatch for %s: expected %s, got %s"
+                         archive expected-checksum actual-checksum)))
+              (let ((exit-status (void/lsp-mssql-extract download-location staging-directory)))
+                (unless (and (integerp exit-status) (zerop exit-status))
+                  (error "Failed to extract SQLToolsService archive %s (exit status %S)"
+                         archive exit-status)))
+              (dolist (file lsp-mssql-executable-files)
+                (let ((target-file (expand-file-name file staging-directory)))
+                  (when (file-exists-p target-file)
+                    (set-file-modes target-file #o755))))
+              (unless (void/lsp-mssql-launcher-present-p staging-directory)
+                (error "SQLToolsService archive %s did not contain its launcher" archive))
+              (with-temp-file (expand-file-name void/lsp-mssql-install-marker staging-directory)
+                (insert void/lsp-mssql-sqltoolsservice-version "\n" archive "\n"))
+              ;; Defer C-g until either the new installation or the restored one
+              ;; is back at the configured path.
+              (let ((inhibit-quit t))
+                (when (file-directory-p install-directory)
+                  (setq backup-directory
+                        (make-temp-file (expand-file-name ".sqltoolsservice-backup-" install-parent) t))
+                  (delete-directory backup-directory t)
+                  (rename-file install-directory backup-directory))
+                (condition-case err
+                    (rename-file staging-directory install-directory)
+                  (error
+                   (when (and backup-directory (file-directory-p backup-directory)
+                              (not (file-exists-p install-directory)))
+                     (rename-file backup-directory install-directory)
+                     (setq backup-directory nil))
+                   (signal (car err) (cdr err)))))
+              (setq staging-directory nil)
+              (when (and backup-directory (file-directory-p backup-directory))
+                (delete-directory backup-directory t)
+                (setq backup-directory nil))
+              (lsp--info "Installed SQLToolsService %s" void/lsp-mssql-sqltoolsservice-version))
+          (when (and download-location (file-exists-p download-location))
+            (delete-file download-location))
+          (when (and staging-directory (file-directory-p staging-directory))
+            (delete-directory staging-directory t))
+          ;; Preserve a backup if restoration itself fails.
+          (when (and backup-directory (file-directory-p backup-directory)
+                     (file-exists-p install-directory))
+            (delete-directory backup-directory t)))))
+
+    (advice-add 'lsp-mssql-download-server :override #'void/lsp-mssql-download-server)
+
+    (let ((client (gethash 'sql lsp-clients)))
+      ;; lsp--client accessors register their setf forms only after lsp-mode
+      ;; loads, so expand this assignment at configuration time.
+      (eval `(setf (lsp--client-new-connection ,client)
+                   (lsp-stdio-connection #'void/lsp-mssql-server-command))))
+
+    ;; lsp-mssql calls a removed lsp-treemacs function when opening its explorer.
+    (when (and (fboundp 'lsp-treemacs-render)
+               (not (fboundp 'lsp-treemacs-initialize)))
+      (defun void/lsp-mssql-show-explorer (tree title)
+        "Render the MSSQL object explorer with current lsp-treemacs."
+        (lsp-treemacs-render tree title 0 "*SQL Object explorer*" nil)
+        (with-current-buffer "*SQL Object explorer*"
+          (display-buffer-in-side-window (current-buffer) '((side . right)))
+          (lsp-mssql-object-explorer-mode)))
+      (advice-add 'lsp-mssql--show-explorer :override #'void/lsp-mssql-show-explorer)))
+
+  (require 'sql)
+  (setq sql-ms-program "sqlcmd"
+        sql-ms-options '("-w" "300" "-n"))
+
+  (defun void/sql-ms ()
+    "Start a Microsoft SQL Server `sqlcmd' session."
+    (interactive)
+    (unless (executable-find sql-ms-program)
+      (user-error "sqlcmd is not installed or is not on PATH"))
+    (call-interactively #'sql-ms))
+
+  (void/leader-keys
+    "m"  '(:ignore t :which-key "mssql/sql")
+    "mc" '(lsp-mssql-connect :which-key "connect lsp")
+    "md" '(lsp-mssql-disconnect :which-key "disconnect lsp")
+    "mb" '(lsp-mssql-execute-buffer :which-key "execute buffer")
+    "mr" '(lsp-mssql-execute-region :which-key "execute region")
+    "mx" '(lsp-mssql-cancel :which-key "cancel query")
+    "mo" '(lsp-mssql-object-explorer :which-key "object explorer")
+    "ms" '(void/sql-ms :which-key "open sqlcmd")
+    "mp" '(sql-send-paragraph :which-key "send paragraph")
+    "mR" '(sql-send-region :which-key "send region")
+    "mB" '(sql-send-buffer :which-key "send buffer"))
+#+end_src
+
+** Manual Formatting
+#+begin_src emacs-lisp
+  ;; External formatters: prettier, csharpier, and sqlfluff.
+  (use-package apheleia
+    :config
+    (setf (alist-get 'prettier-angular apheleia-formatters)
+          '("apheleia-npx" "prettier" "--stdin-filepath" filepath
+            "--parser=angular"))
+    (setf (alist-get 'sqlfluff-tsql apheleia-formatters)
+          '("sqlfluff" "format" "--disable-progress-bar" "--dialect" "tsql"
+            "--stdin-filename" filepath "-"))
+    (setf (alist-get 'sql-mode apheleia-mode-alist) 'sqlfluff-tsql)
+
+    (defun void/apheleia-web-mode-formatter ()
+      "Choose the appropriate Prettier parser for a Web Mode buffer."
+      (setq-local apheleia-formatter
+                  (if (void/angular-project-p default-directory)
+                      'prettier-angular
+                    'prettier-html)))
+
+    (add-hook 'web-mode-hook #'void/apheleia-web-mode-formatter)
+    (with-eval-after-load 'lsp-mode
+      (define-key lsp-command-map (kbd "f") #'apheleia-format-buffer)
+      (define-key lsp-command-map (kbd "C-f")
+                  (lambda () (interactive) (let ((current-prefix-arg '(4)))
+                                             (call-interactively #'apheleia-format-buffer))))))
+#+end_src
+
+** Private Local Settings
+#+begin_src emacs-lisp
+  ;; Put private database profiles in ~/.emacs.d/local.el (ignored by Git).
+  ;; Example:
+  ;; (setq lsp-mssql-connections
+  ;;       [(:server "HOST" :database "DATABASE" :user "USER" :password "PASSWORD")]
+  ;;       sql-connection-alist
+  ;;       '(("example" (sql-product 'ms) (sql-server "HOST")
+  ;;          (sql-database "DATABASE") (sql-user "USER") (sql-password "PASSWORD"))))
+  (let ((local-settings (locate-user-emacs-file "local.el")))
+    (when (file-exists-p local-settings)
+      (load local-settings nil 'nomessage)))
 #+end_src
 
 ** Header Breadcrumb
@@ -394,7 +710,8 @@
 
 ** Lsp-Ivy
 #+begin_src emacs-lisp
-  (use-package lsp-ivy)
+  (use-package lsp-ivy
+    :defer t)
 #+end_src
 
 ** Evil-Nerd-Commenter
