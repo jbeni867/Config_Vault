@@ -21,6 +21,11 @@
 ;; Increase the garbage collection threshold to 100MB to prevent stuttering
 (setq gc-cons-threshold 100000000)
 
+;; Scrolling
+(setq scroll-margin 5)              ; Keep 5 lines visible above/below point
+(setq scroll-conservatively 101)    ; Scroll line-by-line instead of recentering
+(setq scroll-step 1)                ; Scroll one line at a time
+
 (defvar void/default-font-size 115)
 (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
 
@@ -286,6 +291,80 @@
   :custom
   (scss-compile-at-save nil))
 
+;; `tab-prefix-map' (C-x t) and `project-prefix-map' (C-x p) live in built-in
+;; packages that are not loaded at startup, so pull them in before binding.
+(require 'tab-bar)
+(require 'project)
+
+;; `counsel-recentf' needs a recent file list to read from.
+(recentf-mode 1)
+
+(void/leader-keys
+  ;; Buffers
+  "b"  '(:ignore t :which-key "buffers")
+  "bb" '(counsel-switch-buffer :which-key "switch buffer")
+  "bi" '(counsel-ibuffer :which-key "ibuffer")
+  "bd" '(kill-current-buffer :which-key "kill buffer")
+  "bn" '(next-buffer :which-key "next buffer")
+  "bp" '(previous-buffer :which-key "previous buffer")
+  "br" '(revert-buffer-quick :which-key "revert buffer")
+  "bs" '(save-buffer :which-key "save buffer")
+
+  ;; Files
+  "f"  '(:ignore t :which-key "files")
+  "ff" '(counsel-find-file :which-key "find file")
+  "fr" '(counsel-recentf :which-key "recent files")
+  "fd" '(dired :which-key "dired")
+  "fs" '(save-buffer :which-key "save file")
+  "fS" '(write-file :which-key "save file as")
+
+  ;; Git
+  "g"  '(:ignore t :which-key "git")
+  "gg" '(magit-status :which-key "status")
+  "gb" '(magit-blame-addition :which-key "blame")
+  "gd" '(magit-diff-buffer-file :which-key "diff file")
+  "gl" '(magit-log-buffer-file :which-key "log file")
+  "gL" '(magit-log-current :which-key "log branch")
+  "gc" '(magit-clone :which-key "clone")
+
+  ;; Sidebars and other windows worth opening
+  "o"  '(:ignore t :which-key "open")
+  "ot" '(treemacs :which-key "treemacs toggle")
+  "op" '(treemacs-add-and-display-current-project-exclusively :which-key "treemacs this project")
+  "os" '(treemacs-select-window :which-key "select treemacs")
+
+  ;; Whole prefix maps, reachable from both their original prefix and SPC
+  "p"   '(:keymap projectile-command-map :package projectile :which-key "projectile")
+  "P"   '(:keymap project-prefix-map :which-key "project.el")
+  "w"   '(:keymap evil-window-map :package evil :which-key "windows")
+  "TAB" '(:keymap tab-prefix-map :which-key "tabs"))
+
+;; which-key prints "prefix" for any nested keymap that nothing has named.
+;; Keymap-based labels attach to the map itself, so a label shows up under
+;; every prefix that reaches it (SPC p and C-c p, for example).
+(defun void/which-key-label (keymap-symbol &rest pairs)
+  "Name prefix keys inside KEYMAP-SYMBOL for which-key.
+PAIRS is a sequence of KEY DESCRIPTION strings."
+  (when (and (boundp keymap-symbol)
+             (keymapp (symbol-value keymap-symbol)))
+    (apply #'which-key-add-keymap-based-replacements
+           (symbol-value keymap-symbol) pairs)))
+
+(with-eval-after-load 'projectile
+  (void/which-key-label 'projectile-command-map
+                        "4" "other window"
+                        "5" "other frame"
+                        "s" "search"
+                        "x" "run"))
+
+;; lsp-mode ships descriptions for `lsp-command-map', but registers them
+;; against `lsp-keymap-prefix' rather than the prefix the map is bound to.
+;; Re-register them for the leader paths actually in use.
+(with-eval-after-load 'lsp-mode
+  (dolist (prefix '("SPC l" "C-SPC l"))
+    (let ((lsp-keymap-prefix prefix))
+      (lsp-enable-which-key-integration t))))
+
 (defun void/treesit-language-ready-p (language)
   "Return non-nil when LANGUAGE has a usable tree-sitter grammar."
   (and (fboundp 'treesit-available-p)
@@ -328,15 +407,14 @@
          (python-mode . lsp-deferred)
           (js-mode . lsp-deferred)
           (css-mode . lsp-deferred)
-          (css-ts-mode . lsp-deferred)
-         (lsp-mode . lsp-enable-which-key-integration))
+          (css-ts-mode . lsp-deferred))
   :custom
   (lsp-enable-snippet t)                   ; Ensure snippet support is on
   (lsp-completion-provider :capf)          ; Use the standard completion API
   (lsp-completion-show-detail t)           ; Force Roslyn to fetch docs/details
   (lsp-completion-show-kind t)             ; Show icons in the autocomplete menu
   :config
-  (lsp-enable-which-key-integration t)
+  (setq lsp-roslyn-package-version "5.0.0-1.25277.114")
 
    (with-eval-after-load 'lsp-javascript
      (setq lsp-clients-typescript-prefer-use-project-ts-server t))
@@ -347,10 +425,130 @@
    ;; Prefer lsp-mssql over the retained postgres-ls fallback for SQL buffers.
   (add-to-list 'lsp-disabled-clients '(sql-mode sql-ls sqls))
 
-  (define-key lsp-mode-map (kbd "SPC l") nil)
-
  (void/leader-keys
    "l" '(:keymap lsp-command-map :which-key "lsp")))
+
+;; @angular/language-server loads `typescript/lib/tsserverlibrary', which
+;; TypeScript 7 no longer ships, so a globally installed TypeScript 7 makes
+;; the server crash on every start. Resolve TypeScript from the project's own
+;; node_modules (Angular pins a 5.x/6.x release there) and refuse to start at
+;; all unless every piece the server needs is present.
+(require 'subr-x)
+(require 'seq)
+
+(defvar void/angular-ls-enabled t
+  "When nil, `angular-ls' is never started.")
+
+(defvar void/npm-global-node-modules nil
+  "Cached path of the global npm node_modules directory.")
+
+(defun void/npm-global-node-modules ()
+  "Return the global npm node_modules directory, or nil when unavailable."
+  (or void/npm-global-node-modules
+      (setq void/npm-global-node-modules
+            (let ((prefix (ignore-errors
+                            (string-trim
+                             (shell-command-to-string "npm config get --global prefix")))))
+              (when (and prefix (file-directory-p prefix))
+                (let ((modules (expand-file-name
+                                (if (eq system-type 'windows-nt)
+                                    "node_modules"
+                                  "lib/node_modules")
+                                prefix)))
+                  (and (file-directory-p modules) modules)))))))
+
+(defun void/angular-ts-probe-location (root)
+  "Return ROOT's node_modules when it holds a usable tsserverlibrary."
+  (let ((modules (expand-file-name "node_modules" root)))
+    (and (file-exists-p (expand-file-name "typescript/lib/tsserverlibrary.js" modules))
+         modules)))
+
+(defun void/angular-ng-probe-locations (root)
+  "Return directories that provide @angular/language-service for ROOT."
+  (let* ((global-modules (void/npm-global-node-modules))
+         (candidates (delq nil
+                           (list (expand-file-name "node_modules" root)
+                                 global-modules
+                                 (when global-modules
+                                   (expand-file-name
+                                    "@angular/language-server/node_modules"
+                                    global-modules))))))
+    (seq-filter (lambda (directory)
+                  (file-directory-p
+                   (expand-file-name "@angular/language-service" directory)))
+                candidates)))
+
+(defun void/angular-ls-program (root)
+  "Return the command that runs the Angular language server for ROOT."
+  (let* ((global-modules (void/npm-global-node-modules))
+         (entry (seq-find
+                 #'file-exists-p
+                 (delq nil
+                       (list (expand-file-name
+                              "node_modules/@angular/language-server/index.js" root)
+                             (when global-modules
+                               (expand-file-name
+                                "@angular/language-server/index.js" global-modules))))))
+         (node (executable-find "node")))
+    (cond ((and entry node) (list node entry))
+          ((executable-find "ngserver") (list "ngserver")))))
+
+(defun void/angular-ls-root (&optional directory)
+  "Return the Angular project root when `angular-ls' can start for DIRECTORY."
+  (let ((root (and void/angular-ls-enabled
+                   (void/angular-project-p directory))))
+    (and root
+         (void/angular-ls-program root)
+         (void/angular-ts-probe-location root)
+         (void/angular-ng-probe-locations root)
+         root)))
+
+(defun void/angular-ls-command ()
+  "Return the `angular-ls' command line for the current buffer."
+  (let ((root (or (void/angular-ls-root)
+                  (user-error "Angular language server prerequisites are missing"))))
+    (append (void/angular-ls-program root)
+            (list "--stdio"
+                  "--tsProbeLocations" (void/angular-ts-probe-location root)
+                  "--ngProbeLocations" (string-join (void/angular-ng-probe-locations root) ",")))))
+
+(defun void/angular-ls-activate-p (&rest _)
+  "Return non-nil when `angular-ls' should attach to the current buffer."
+  (and buffer-file-name
+       (string-match-p "\\.\\(html\\|ts\\)\\'" buffer-file-name)
+       (void/angular-ls-root (file-name-directory buffer-file-name))
+       t))
+
+(defun void/toggle-angular-ls ()
+  "Toggle whether `angular-ls' is allowed to start."
+  (interactive)
+  (setq void/angular-ls-enabled (not void/angular-ls-enabled))
+  (message "angular-ls %s" (if void/angular-ls-enabled "enabled" "disabled")))
+
+(defun void/angular-ls-diagnose ()
+  "Report what `angular-ls' resolves for the current buffer."
+  (interactive)
+  (let ((root (void/angular-project-p)))
+    (message "angular.json root: %s | server: %s | ts probe: %s | ng probes: %s"
+             root
+             (and root (void/angular-ls-program root))
+             (and root (void/angular-ts-probe-location root))
+             (and root (void/angular-ng-probe-locations root)))))
+
+(with-eval-after-load 'lsp-mode
+  (require 'lsp-angular)
+  (let ((client (gethash 'angular-ls lsp-clients)))
+    (when client
+      ;; lsp--client accessors register their setf forms only after lsp-mode
+      ;; loads, so expand these assignments at configuration time.
+      (eval `(setf (lsp--client-new-connection ,client)
+                   (lsp-stdio-connection #'void/angular-ls-command)))
+      (eval `(setf (lsp--client-activation-fn ,client)
+                   #'void/angular-ls-activate-p)))))
+
+(void/leader-keys
+  "ta" '(void/toggle-angular-ls :which-key "toggle angular-ls")
+  "tA" '(void/angular-ls-diagnose :which-key "diagnose angular-ls"))
 
 ;; SQLToolsService is downloaded on demand. sqlcmd is also required for
 ;; `void/sql-ms'.
@@ -641,6 +839,15 @@
 (use-package flycheck
   :ensure t
   :init (global-flycheck-mode))
+
+;; Treemacs was only ever arriving as an lsp-treemacs dependency; declare it
+;; so it is installed and configured on its own terms.
+(use-package treemacs
+  :ensure t
+  :defer t
+  :custom
+  (treemacs-width 35)
+  (treemacs-follow-after-init t))
 
 (use-package lsp-treemacs
   :after lsp)
