@@ -819,9 +819,6 @@ PAIRS is a sequence of KEY DESCRIPTION strings."
   (company-minimum-prefix-length 1)
   (company-idle-delay 0.1))
 
-;; (use-package company-box
-;;   :hook (company-mode . company-box-mode))
-
 (use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :custom
@@ -840,8 +837,6 @@ PAIRS is a sequence of KEY DESCRIPTION strings."
   :ensure t
   :init (global-flycheck-mode))
 
-;; Treemacs was only ever arriving as an lsp-treemacs dependency; declare it
-;; so it is installed and configured on its own terms.
 (use-package treemacs
   :ensure t
   :defer t

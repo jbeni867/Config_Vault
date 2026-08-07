@@ -881,8 +881,6 @@
     (company-minimum-prefix-length 1)
     (company-idle-delay 0.1))
 
-  ;; (use-package company-box
-  ;;   :hook (company-mode . company-box-mode))
 #+end_src
 
 ** Better LSP UI
@@ -911,8 +909,6 @@
 
 ** Treemacs
 #+begin_src emacs-lisp
-  ;; Treemacs was only ever arriving as an lsp-treemacs dependency; declare it
-  ;; so it is installed and configured on its own terms.
   (use-package treemacs
     :ensure t
     :defer t
