@@ -6,6 +6,7 @@
 (set-fringe-mode 20)
 (menu-bar-mode -1)
 (keymap-global-set "<escape>" 'keyboard-escape-quit)
+
 (global-display-line-numbers-mode t)
 (setq display-line-numbers-type 'relative)
 (column-number-mode)
@@ -25,6 +26,17 @@
 (setq scroll-margin 5)              ; Keep 5 lines visible above/below point
 (setq scroll-conservatively 101)    ; Scroll line-by-line instead of recentering
 (setq scroll-step 1)                ; Scroll one line at a time
+
+;; Tab Width
+(setq-default tab-width 4)
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (setq-local indent-tabs-mode nil)))
+
+;; Truncate Lines
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (setq-local truncate-lines t)))
 
 (defvar void/default-font-size 115)
 (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
@@ -74,35 +86,39 @@
 (setq use-package-always-ensure t)
 
 (dolist (mode '(org-mode-hook
-		term-mode-hook
-		eshell-mode-hook))
+                term-mode-hook
+                eshell-mode-hook))
   (add-hook mode(lambda () (display-line-numbers-mode 0))))
+
+(add-hook 'image-mode-hook
+          (lambda ()
+            (display-line-numbers-mode -1)))
 
 ;; Set faces for heading levels
 (with-eval-after-load 'org-faces
   (dolist (face '((org-level-1 . 1.2)
-		  (org-level-2 . 1.1)
-		  (org-level-3 . 1.05)
-		  (org-level-4 . 1.0)
-		  (org-level-5 . 1.1)
-		  (org-level-6 . 1.1)
-		  (org-level-7 . 1.1)
-		  (org-level-8 . 1.1)))
+		          (org-level-2 . 1.1)
+		          (org-level-3 . 1.05)
+		          (org-level-4 . 1.0)
+		          (org-level-5 . 1.1)
+		          (org-level-6 . 1.1)
+		          (org-level-7 . 1.1)
+		          (org-level-8 . 1.1)))
     (set-face-attribute (car face) nil :font void/my-ui-font :weight 'regular :height (cdr face))))
 
 ;; Ensure that anything that should be fixed-pitch in Org files appears that way
 (with-eval-after-load 'org
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
 (defun void/org-mode-visual-fill ()
   (setq visual-fill-column-width 200
-	visual-fill-column-center-text t)
+	    visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (defun void/org-mode-setup ()
@@ -344,18 +360,23 @@
 ;; every prefix that reaches it (SPC p and C-c p, for example).
 (defun void/which-key-label (keymap-symbol &rest pairs)
   "Name prefix keys inside KEYMAP-SYMBOL for which-key.
-PAIRS is a sequence of KEY DESCRIPTION strings."
+  PAIRS is a sequence of KEY DESCRIPTION strings."
   (when (and (boundp keymap-symbol)
              (keymapp (symbol-value keymap-symbol)))
     (apply #'which-key-add-keymap-based-replacements
            (symbol-value keymap-symbol) pairs)))
 
 (with-eval-after-load 'projectile
+  (define-key projectile-command-map (kbd "s s") #'counsel-rg)
+
   (void/which-key-label 'projectile-command-map
                         "4" "other window"
                         "5" "other frame"
                         "s" "search"
-                        "x" "run"))
+                        "x" "run")
+
+  (which-key-add-key-based-replacements
+    "SPC p s s" "counsel-rg"))
 
 ;; lsp-mode ships descriptions for `lsp-command-map', but registers them
 ;; against `lsp-keymap-prefix' rather than the prefix the map is bound to.
