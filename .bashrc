@@ -104,6 +104,7 @@ alias tsd='sudo tailscale down'
 
 alias rofi='rofi -show drun -dpi 0'
 
+alias v0='amixer sset 'Master' 0%'
 alias v1='amixer sset 'Master' 10%'
 alias v2='amixer sset 'Master' 20%'
 alias v3='amixer sset 'Master' 30%'
