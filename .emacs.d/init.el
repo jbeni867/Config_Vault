@@ -152,10 +152,10 @@
 
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
-	 ("C-x b" . counsel-ibuffer)
-	 ("C-x C-f" . counsel-find-file)
-	 :map minibuffer-local-map
-	 ("C-r" . 'counsel-minibuffer-history))
+  	     ("C-x b" . counsel-ibuffer)
+  	     ("C-x C-f" . counsel-find-file)
+  	     :map minibuffer-local-map
+  	     ("C-r" . 'counsel-minibuffer-history))
   :config
   (setq ivy-initial-inputs-alist nil))
 
@@ -219,7 +219,7 @@
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-  ; Use visual line motions even outside of visual-line-mode buffers
+                                        ; Use visual line motions even outside of visual-line-mode buffers
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
   (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
   (evil-set-initial-state 'messages-buffer-mode 'normal)
@@ -254,7 +254,7 @@
   (when (file-directory-p "~/Development")
     (setq projectile-project-search-path '("~/Development")))
   (setq projectile-switch-project-action #'projectile-dired))
-  ; TODO: Add info about <M-o> giving more info on additional operations
+                                        ; TODO: Add info about <M-o> giving more info on additional operations
 (use-package counsel-projectile
   :config (counsel-projectile-mode))
 
@@ -262,7 +262,7 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
-; TODO: Still need to configure this plugin
+                                        ; TODO: Still need to configure this plugin
 (use-package forge)
 
 (use-package org
@@ -306,6 +306,37 @@
 (use-package scss-mode
   :custom
   (scss-compile-at-save nil))
+
+
+(use-package dirvish
+  :ensure t
+  :init
+  ;; Use Dirvish whenever Dired is opened.
+  (dirvish-override-dired-mode)
+
+  :custom
+  ;; Information displayed alongside files.
+  (dirvish-attributes
+   '(nerd-icons
+     file-size
+     collapse
+     subtree-state
+     vc-state
+     git-msg))
+
+  ;; 40% file browser / 60% preview.
+  (dirvish-default-layout '(0 0.4 0.6)))
+
+(use-package hl-todo
+  :ensure t
+  :hook (prog-mode . hl-todo-mode)
+  :config
+  (setq hl-todo-keyword-faces
+        '(("TODO"    . "#FF8C00")
+          ("FIXME"   . "#FF2D00")
+          ("NOTE"    . "#3498DB")
+          ("HACK"    . "#ed05a4")
+          ("WARNING" . "#dbcd32"))))
 
 ;; `tab-prefix-map' (C-x t) and `project-prefix-map' (C-x p) live in built-in
 ;; packages that are not loaded at startup, so pull them in before binding.
@@ -385,6 +416,124 @@
   (dolist (prefix '("SPC l" "C-SPC l"))
     (let ((lsp-keymap-prefix prefix))
       (lsp-enable-which-key-integration t))))
+
+(use-package markdown-mode
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :config
+
+  ;; Pandoc handles Markdown -> HTML.
+  (setq markdown-command "pandoc -f markdown -t html5"
+        markdown-split-window-direction 'right)
+
+  ;; GitHub Markdown CSS expects the rendered document inside
+  ;; an element with class="markdown-body".
+  (setq markdown-xhtml-body-preamble
+        "<article class=\"markdown-body\">"
+        markdown-xhtml-body-epilogue
+        "</article>")
+
+  ;; Location of all Markdown themes.
+  (setq my-markdown-css-directory
+        (expand-file-name "markdown-css/" user-emacs-directory))
+
+  ;; Available themes.
+  (setq my-markdown-css-themes
+        '(("GitHub"   . "github-markdown.css")
+          ("Dracula"  . "dracula-markdown.css")
+          ("Splendor" . "splendor.css")
+          ("Modest"   . "modest.css")))
+
+  ;; Default theme: GitHub.
+  (setq markdown-css-paths
+        (list
+         (expand-file-name
+          "github-markdown.css"
+          my-markdown-css-directory)))
+
+  (defun my-markdown-select-css ()
+    "Select the CSS theme for the current Markdown buffer."
+    (interactive)
+
+    (unless (derived-mode-p 'markdown-mode)
+      (user-error "This command must be run from a Markdown buffer"))
+
+    (let* ((theme
+            (completing-read
+             "Markdown theme: "
+             (mapcar #'car my-markdown-css-themes)
+             nil
+             t))
+           (filename
+            (cdr (assoc theme my-markdown-css-themes)))
+           (css-file
+            (expand-file-name
+             filename
+             my-markdown-css-directory)))
+
+      ;; Catch missing CSS files immediately.
+      (unless (file-exists-p css-file)
+        (user-error "Markdown CSS file does not exist: %s"
+                    css-file))
+
+      ;; Make the selection specific to this Markdown buffer.
+      (setq-local markdown-css-paths (list css-file))
+
+      ;; Immediately refresh an active live preview.
+      (when (bound-and-true-p markdown-live-preview-mode)
+        (markdown-live-preview-export))
+
+      (message "Markdown theme: %s" theme))))
+
+
+;; Convert between Org and Markdown.
+;; This lives outside use-package so it is available from either mode.
+(defun my-convert-org-markdown ()
+  "Convert the current buffer between Org and Markdown using Pandoc."
+  (interactive)
+
+  (cond
+   ;; Org -> Markdown
+   ((derived-mode-p 'org-mode)
+    (let ((output-buffer
+           (get-buffer-create "*Org → Markdown*")))
+      (shell-command-on-region
+       (point-min)
+       (point-max)
+       "pandoc -f org -t gfm"
+       output-buffer)
+
+      (with-current-buffer output-buffer
+        (markdown-mode))
+
+      (pop-to-buffer output-buffer)))
+
+   ;; Markdown -> Org
+   ((derived-mode-p 'markdown-mode)
+    (let ((output-buffer
+           (get-buffer-create "*Markdown → Org*")))
+      (shell-command-on-region
+       (point-min)
+       (point-max)
+       "pandoc -f gfm -t org"
+       output-buffer)
+
+      (with-current-buffer output-buffer
+        (org-mode))
+
+      (pop-to-buffer output-buffer)))
+
+   ;; Anything else
+   (t
+    (user-error "Current buffer must be Org or Markdown"))))
+
+
+;; Markdown / Org commands under SPC t
+(void/leader-keys
+  "tm" '(my-markdown-select-css
+         :which-key "choose markdown theme")
+  "tc" '(my-convert-org-markdown
+         :which-key "convert org/markdown"))
 
 (defun void/treesit-language-ready-p (language)
   "Return non-nil when LANGUAGE has a usable tree-sitter grammar."
@@ -856,7 +1005,10 @@
 
 (use-package flycheck
   :ensure t
-  :init (global-flycheck-mode))
+  :init (global-flycheck-mode)
+  :config
+  (with-eval-after-load 'lsp-mode
+    (define-key lsp-command-map (kbd "g e") #'flycheck-list-errors)))
 
 (use-package treemacs
   :ensure t
