@@ -336,7 +336,23 @@
           ("FIXME"   . "#FF2D00")
           ("NOTE"    . "#3498DB")
           ("HACK"    . "#ed05a4")
-          ("WARNING" . "#dbcd32"))))
+          ("WARNING" . "#dbcd32")))
+
+  (defun my-highlight-todo-comments ()
+    (font-lock-add-keywords
+     nil
+     '(("\\(TODO\\).*?$"
+        0 '(:foreground "#FF8C00") prepend)
+       ("\\(FIXME\\).*?$"
+        0 '(:foreground "#FF2D00") prepend)
+       ("\\(NOTE\\).*?$"
+        0 '(:foreground "#3498DB") prepend)
+       ("\\(HACK\\).*?$"
+        0 '(:foreground "#ed05a4") prepend)
+       ("\\(WARNING\\).*?$"
+        0 '(:foreground "#dbcd32") prepend))))
+
+  (add-hook 'prog-mode-hook #'my-highlight-todo-comments))
 
 ;; `tab-prefix-map' (C-x t) and `project-prefix-map' (C-x p) live in built-in
 ;; packages that are not loaded at startup, so pull them in before binding.

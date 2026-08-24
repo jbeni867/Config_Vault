@@ -357,16 +357,32 @@
     ;; 40% file browser / 60% preview.
     (dirvish-default-layout '(0 0.4 0.6)))
 
-  (use-package hl-todo
-    :ensure t
-    :hook (prog-mode . hl-todo-mode)
-    :config
-    (setq hl-todo-keyword-faces
-          '(("TODO"    . "#FF8C00")
-            ("FIXME"   . "#FF2D00")
-            ("NOTE"    . "#3498DB")
-            ("HACK"    . "#ed05a4")
-            ("WARNING" . "#dbcd32"))))
+(use-package hl-todo
+  :ensure t
+  :hook (prog-mode . hl-todo-mode)
+  :config
+  (setq hl-todo-keyword-faces
+        '(("TODO"    . "#FF8C00")
+          ("FIXME"   . "#FF2D00")
+          ("NOTE"    . "#3498DB")
+          ("HACK"    . "#ed05a4")
+          ("WARNING" . "#dbcd32")))
+
+  (defun my-highlight-todo-comments ()
+    (font-lock-add-keywords
+     nil
+     '(("\\(TODO\\).*?$"
+        0 '(:foreground "#FF8C00") prepend)
+       ("\\(FIXME\\).*?$"
+        0 '(:foreground "#FF2D00") prepend)
+       ("\\(NOTE\\).*?$"
+        0 '(:foreground "#3498DB") prepend)
+       ("\\(HACK\\).*?$"
+        0 '(:foreground "#ed05a4") prepend)
+       ("\\(WARNING\\).*?$"
+        0 '(:foreground "#dbcd32") prepend))))
+
+  (add-hook 'prog-mode-hook #'my-highlight-todo-comments))
 #+end_src
 
 ** Leader Key Bindings
