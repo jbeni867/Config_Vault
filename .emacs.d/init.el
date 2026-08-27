@@ -262,6 +262,14 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+;; Show Git changes in the fringe for tracked files.
+(use-package git-gutter
+  :ensure t
+  :custom
+  (git-gutter:update-interval 0.1)
+  :config
+  (global-git-gutter-mode +1))
+
                                         ; TODO: Still need to configure this plugin
 (use-package forge)
 
@@ -389,6 +397,7 @@
   "gl" '(magit-log-buffer-file :which-key "log file")
   "gL" '(magit-log-current :which-key "log branch")
   "gc" '(magit-clone :which-key "clone")
+  "gG" '(global-git-gutter-mode :which-key "toggle gutter")
 
   ;; Sidebars and other windows worth opening
   "o"  '(:ignore t :which-key "open")
