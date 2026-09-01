@@ -81,10 +81,20 @@
 
   ;; Set the variable pitch face
   (set-face-attribute 'variable-pitch nil
-  		    :font void/my-ui-font
-  		    :height void/default-font-size
-  		    :weight 'regular)
-  
+    		            :font void/my-ui-font
+    		            :height void/default-font-size
+    		            :weight 'regular)
+
+  ;; Better emoji/symbol fallback on Windows
+  (when (eq system-type 'windows-nt)
+    (set-fontset-font t 'emoji
+                      (font-spec :family "Segoe UI Emoji")
+                      nil 'prepend)
+
+    (set-fontset-font t 'symbol
+                      (font-spec :family "Segoe UI Symbol")
+                      nil 'append))
+
 #+end_src
 
 * Org Mode
