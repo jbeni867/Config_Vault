@@ -38,6 +38,18 @@
           (lambda ()
             (setq-local truncate-lines t)))
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (when (memq system-type '(darwin gnu/linux))
+    (setq exec-path-from-shell-arguments '("-l"))
+    (exec-path-from-shell-copy-envs
+     '("PATH"
+       "GOPATH"
+       "JAVA_HOME"
+       "DOTNET_ROOT"
+       "NVM_DIR"))))
+
 (defvar void/default-font-size 115)
 (defvar void/my-ui-font (if (eq system-type 'windows-nt) "Segoe UI" "Cantarell"))
 
@@ -152,10 +164,10 @@
 
 (use-package counsel
   :bind (("M-x" . counsel-M-x)
-  	     ("C-x b" . counsel-ibuffer)
-  	     ("C-x C-f" . counsel-find-file)
-  	     :map minibuffer-local-map
-  	     ("C-r" . 'counsel-minibuffer-history))
+    	 ("C-x b" . counsel-ibuffer)
+    	 ("C-x C-f" . counsel-find-file)
+    	 :map minibuffer-local-map
+    	 ("C-r" . 'counsel-minibuffer-history))
   :config
   (setq ivy-initial-inputs-alist nil))
 
@@ -263,15 +275,16 @@
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
 ;; Show Git changes in the fringe for tracked files.
-(use-package git-gutter
+(use-package diff-hl
   :ensure t
-  :custom
-  (git-gutter:update-interval 0.1)
+  :hook
+  ((prog-mode . diff-hl-mode)
+   (org-mode . diff-hl-mode))
   :config
-  (global-git-gutter-mode +1))
+  (diff-hl-flydiff-mode 1)
+  (diff-hl-margin-mode -1))
 
-                                        ; TODO: Still need to configure this plugin
-(use-package forge)
+(use-package forge)                     ; TODO: Still need to configure this plugin
 
 (use-package org
   :hook (org-mode . void/org-mode-setup)
@@ -343,7 +356,7 @@
         '(("TODO"    . "#FF8C00")
           ("FIXME"   . "#FF2D00")
           ("NOTE"    . "#3498DB")
-          ("HACK"    . "#ed05a4")
+          ("QUESTION"    . "#ed05a4")
           ("WARNING" . "#dbcd32")))
 
   (defun my-highlight-todo-comments ()
@@ -355,7 +368,7 @@
         0 '(:foreground "#FF2D00") prepend)
        ("\\(NOTE\\).*?$"
         0 '(:foreground "#3498DB") prepend)
-       ("\\(HACK\\).*?$"
+       ("\\(QUESTION\\).*?$"
         0 '(:foreground "#ed05a4") prepend)
        ("\\(WARNING\\).*?$"
         0 '(:foreground "#dbcd32") prepend))))
@@ -609,7 +622,7 @@
   (lsp-completion-show-detail t)           ; Force Roslyn to fetch docs/details
   (lsp-completion-show-kind t)             ; Show icons in the autocomplete menu
   :config
-  (setq lsp-roslyn-package-version "5.0.0-1.25277.114")
+  (setq lsp-diagnostics-provider :flycheck)
 
    (with-eval-after-load 'lsp-javascript
      (setq lsp-clients-typescript-prefer-use-project-ts-server t))
@@ -1041,6 +1054,9 @@
   :custom
   (treemacs-width 35)
   (treemacs-follow-after-init t))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile))
 
 (use-package lsp-treemacs
   :after lsp)
