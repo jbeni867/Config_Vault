@@ -38,6 +38,17 @@
           (lambda ()
             (setq-local truncate-lines t)))
 
+;; Windows GUI Emacs can find git.exe through Git/cmd, but Git's Unix
+;; utilities (including diff.exe) live in Git/usr/bin instead.
+(when (eq system-type 'windows-nt)
+  (let ((git-usr-bin "C:/Program Files/Git/usr/bin"))
+    (when (file-directory-p git-usr-bin)
+      (add-to-list 'exec-path git-usr-bin)
+      (setenv "PATH"
+              (concat git-usr-bin ";" (getenv "PATH"))))))
+
+;; macOS/Linux GUI Emacs may not inherit the login shell environment, so
+;; import the executable path and related variables from the login shell.
 (use-package exec-path-from-shell
   :ensure t
   :config
@@ -281,6 +292,10 @@
   ((prog-mode . diff-hl-mode)
    (org-mode . diff-hl-mode))
   :config
+  ;; flydiff needs an external GNU-compatible `diff'. On Windows this is
+  ;; supplied by Git for Windows and added to PATH/exec-path above.
+  (when (eq system-type 'windows-nt)
+    (setq diff-program "diff"))
   (diff-hl-flydiff-mode 1)
   (diff-hl-margin-mode -1))
 
@@ -410,7 +425,7 @@
   "gl" '(magit-log-buffer-file :which-key "log file")
   "gL" '(magit-log-current :which-key "log branch")
   "gc" '(magit-clone :which-key "clone")
-  "gG" '(global-git-gutter-mode :which-key "toggle gutter")
+  "gG" '(diff-hl-mode :which-key "toggle diff-hl")
 
   ;; Sidebars and other windows worth opening
   "o"  '(:ignore t :which-key "open")
