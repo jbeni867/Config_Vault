@@ -480,7 +480,10 @@
     "p"   '(:keymap projectile-command-map :package projectile :which-key "projectile")
     "P"   '(:keymap project-prefix-map :which-key "project.el")
     "w"   '(:keymap evil-window-map :package evil :which-key "windows")
-    "TAB" '(:keymap tab-prefix-map :which-key "tabs"))
+    "TAB" '(:keymap tab-prefix-map :which-key "tabs")
+
+    ;; Restclient
+    "r"   '(:ignore r :which-key "restclient"))
 #+end_src
 
 ** Which-Key Labels
@@ -1201,4 +1204,12 @@
   ;;     (setq explicit-shell-file-name "/bin/bash")
   ;;     (setq shell-file-name "/bin/bash")
   ;;     (setq shell-command-switch "-c")))
+#+end_src
+
+* Restclient
+#+begin_src emacs-lisp
+  (use-package restclient
+    :init
+    (void/leader-keys
+      "rr" '(restclient-http-send-current :which-key "Send request")))
 #+end_src

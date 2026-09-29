@@ -447,7 +447,10 @@
   "p"   '(:keymap projectile-command-map :package projectile :which-key "projectile")
   "P"   '(:keymap project-prefix-map :which-key "project.el")
   "w"   '(:keymap evil-window-map :package evil :which-key "windows")
-  "TAB" '(:keymap tab-prefix-map :which-key "tabs"))
+  "TAB" '(:keymap tab-prefix-map :which-key "tabs")
+
+  ;; Restclient
+  "r"   '(:ignore r :which-key "restclient"))
 
 ;; which-key prints "prefix" for any nested keymap that nothing has named.
 ;; Keymap-based labels attach to the map itself, so a label shows up under
@@ -1115,3 +1118,8 @@
 ;;     (setq explicit-shell-file-name "/bin/bash")
 ;;     (setq shell-file-name "/bin/bash")
 ;;     (setq shell-command-switch "-c")))
+
+(use-package restclient
+  :init
+  (void/leader-keys
+    "rr" '(restclient-http-send-current :which-key "Send request")))
