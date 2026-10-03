@@ -11,3 +11,12 @@
 .emacs.d/projectile-frecency.eld
 .emacs.d/transient/
 .emacs.d/local.el
+.emacs.d/.cache/
+.emacs.d/.emacs.desktop*
+.emacs.d/.lsp-session-v1
+.emacs.d/elfeed/
+.emacs.d/eln-cache/
+.emacs.d/projects
+.emacs.d/recentf
+.emacs.d/tramp
+*~

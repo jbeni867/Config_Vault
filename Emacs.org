@@ -1213,3 +1213,12 @@
     (void/leader-keys
       "rr" '(restclient-http-send-current :which-key "Send request")))
 #+end_src
+
+* RSS
+#+begin_src emacs-lisp
+      (use-package elfeed)
+
+      (setq elfeed-feeds
+            '("https://restofworld.org/feed/"
+              "https://www.ben-evans.com/benedictevans?format=rss"))
+#+end_src

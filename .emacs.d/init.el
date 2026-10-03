@@ -1123,3 +1123,9 @@
   :init
   (void/leader-keys
     "rr" '(restclient-http-send-current :which-key "Send request")))
+
+(use-package elfeed)
+
+(setq elfeed-feeds
+      '("https://restofworld.org/feed/"
+        "https://www.ben-evans.com/benedictevans?format=rss"))
