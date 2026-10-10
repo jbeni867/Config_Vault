@@ -1,4 +1,4 @@
-#+title Emacs Init Config
+#+title: Emacs Init Config
 #+property: header-args:emacs-lisp :tangle ./.emacs.d/init.el :mkdirp yes
 
 
