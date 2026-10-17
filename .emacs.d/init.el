@@ -53,7 +53,7 @@
   :ensure t
   :config
   (when (memq system-type '(darwin gnu/linux))
-    (setq exec-path-from-shell-arguments '("-l"))
+    (setq exec-path-from-shell-arguments '("-i" "-l"))
     (exec-path-from-shell-copy-envs
      '("PATH"
        "GOPATH"
@@ -616,6 +616,16 @@
 (when (void/treesit-language-ready-p 'css)
   (add-to-list 'auto-mode-alist '("\\.css\\'" . css-ts-mode)))
 
+(defun void/csharp-highlighting-setup ()
+  "Enable detailed syntax and semantic highlighting for C# buffers."
+  (setq-local lsp-semantic-tokens-enable t)
+  (when (derived-mode-p 'csharp-ts-mode)
+    (setq-local treesit-font-lock-level 4)
+    (treesit-font-lock-recompute-features)))
+
+(add-hook 'csharp-mode-hook #'void/csharp-highlighting-setup)
+(add-hook 'csharp-ts-mode-hook #'void/csharp-highlighting-setup)
+
 (defun void/angular-project-p (&optional directory)
   "Return non-nil when DIRECTORY belongs to an Angular project."
   (locate-dominating-file (or directory default-directory) "angular.json"))
@@ -1127,5 +1137,6 @@
 (use-package elfeed)
 
 (setq elfeed-feeds
-      '("https://restofworld.org/feed/"
-        "https://www.ben-evans.com/benedictevans?format=rss"))
+      '(("https://restofworld.org/feed/" :readable t :title "Rest of World" emacs)
+        ("https://www.ben-evans.com/benedictevans?format=rss" :readable t :title "Benedict Evans")
+        ("https://www.reddit.com/r/LocalLLaMA.rss" :title "Reddit: LocalLLaMA")))
