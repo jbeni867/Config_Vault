@@ -1,16 +1,17 @@
-require("keymaps")
-require("plugins")
+-- Set leaders before plugins or mappings are loaded.
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
-require("configs/lsp_config")
-require("configs/onedark_config")
-require("configs/lualine_config")
-require("configs/nvim-tree_config")
-require("configs/nvim-treesitter_config")
-require("configs/telescope_config")
-require("configs/none-ls_config")
-require("configs/completions_config")
-require("configs/autopairs_config")
-require("configs/live_server_config")
-require("configs/dadbod_config")
-require("configs/noice_config")
-require("configs/vim_tmux_navigator")
+if vim.fn.has("nvim-0.12") == 0 then
+    error("This configuration requires Neovim 0.12 or newer")
+end
+
+require("options")
+require("plugins")
+require("keymaps")
+
+-- Optional machine-local settings (database connections, etc.); never commit secrets.
+local local_config = vim.fn.stdpath("config") .. "/local.lua"
+if vim.uv.fs_stat(local_config) then
+    dofile(local_config)
+end

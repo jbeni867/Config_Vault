@@ -1,32 +1,28 @@
 require("luasnip.loaders.from_vscode").lazy_load()
-
-local cmp = require("cmp")
-local cmp_autopairs = require("nvim-autopairs.completion.cmp")
-
-cmp.setup({
-	snippet = {
-		-- REQUIRED - you must specify a snippet engine
-		expand = function(args)
-			-- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-			require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
-		end,
-	},
-	window = {
-		completion = cmp.config.window.bordered(),
-		documentation = cmp.config.window.bordered(),
-	},
-	mapping = cmp.mapping.preset.insert({
-		["<C-b>"] = cmp.mapping.scroll_docs(-4),
-		["<C-f>"] = cmp.mapping.scroll_docs(4),
-		["<C-Space>"] = cmp.mapping.complete(),
-		["<C-e>"] = cmp.mapping.abort(),
-		["<C-y>"] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-	}),
-	sources = cmp.config.sources({
-		{ name = "nvim_lsp" },
-		{ name = "luasnip" }, -- For luasnip users.
-	}, {
-		{ name = "buffer" },
-	}),
+require("blink.cmp").setup({
+    snippets = { preset = "luasnip" },
+    -- Lua implementation avoids platform-specific binary downloads/builds.
+    fuzzy = { implementation = "lua" },
+    keymap = {
+        preset = "default",
+        ["<Tab>"] = { "select_and_accept", "snippet_forward", "fallback" },
+        ["<S-Tab>"] = { "snippet_backward", "fallback" },
+        ["<C-k>"] = false, -- Do not shadow window navigation / legacy hover chord.
+    },
+    completion = {
+        menu = { border = "rounded" },
+        documentation = { auto_show = true, window = { border = "rounded" } },
+        list = { selection = { preselect = false, auto_insert = false } },
+    },
+    sources = {
+        default = { "lsp", "path", "snippets", "buffer" },
+        per_filetype = {
+            sql = { "dadbod", "lsp", "snippets", "buffer" },
+            mysql = { "dadbod", "lsp", "snippets", "buffer" },
+            plsql = { "dadbod", "lsp", "snippets", "buffer" },
+        },
+        providers = {
+            dadbod = { name = "DB", module = "vim_dadbod_completion.blink" },
+        },
+    },
 })
-cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())

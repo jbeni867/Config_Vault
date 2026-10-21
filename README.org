@@ -1,5 +1,9 @@
 #+title: README
 
+* Editor configurations
++ [[file:.config/nvim/README.md][Neovim setup, migration notes, and Emacs-style keybindings]] (Neovim 0.12+)
++ [[file:Emacs.org][Emacs literate configuration]]
+
 * Getting Started
 ** Configuring system
 + Linux

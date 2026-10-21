@@ -1,60 +1,152 @@
--- Installing Packer if not installed
-local ensure_packer = function()
-    local fn = vim.fn
-    local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
-    if fn.empty(fn.glob(install_path)) > 0 then
-        fn.system({ "git", "clone", "--depth", "1", "https://github.com/wbthomason/packer.nvim", install_path })
-        vim.cmd([[packadd packer.nvim]])
-        return true
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.uv.fs_stat(lazypath) then
+    local output = vim.fn.system({
+        "git",
+        "clone",
+        "--filter=blob:none",
+        "--branch=stable",
+        "https://github.com/folke/lazy.nvim.git",
+        lazypath,
+    })
+    if vim.v.shell_error ~= 0 then
+        error("Could not bootstrap lazy.nvim:\n" .. output)
     end
-    return false
 end
+vim.opt.rtp:prepend(lazypath)
 
-local packer_bootstrap = ensure_packer()
-
-return require("packer").startup(function(use)
-    use("wbthomason/packer.nvim")
-
-    -- My plugins here
-    use("navarasu/onedark.nvim")
-    use("nvim-tree/nvim-tree.lua")
-    use("nvim-tree/nvim-web-devicons")
-    use("nvim-lualine/lualine.nvim")
-    use({
-        "nvim-treesitter/nvim-treesitter",
-        run = function()
-            local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
-            ts_update()
+require("lazy").setup({
+    {
+        "navarasu/onedark.nvim",
+        priority = 1000,
+        config = function()
+            require("configs.onedark_config")
         end,
-    })
-    use({ "nvim-telescope/telescope.nvim", tag = "0.1.6", requires = { { "nvim-lua/plenary.nvim" } } })
-    use("williamboman/mason.nvim")
-    use("williamboman/mason-lspconfig.nvim")
-    use("neovim/nvim-lspconfig")
-    use("nvim-telescope/telescope-ui-select.nvim")
-    use("nvimtools/none-ls.nvim")
-    use("hrsh7th/nvim-cmp")
-    use({
-        "L3MON4D3/LuaSnip",
-        -- follow latest release.
-        tag = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-        -- install jsregexp (optional!:).
-        run = "make install_jsregexp",
-    })
-    use("saadparwaiz1/cmp_luasnip")
-    use("rafamadriz/friendly-snippets")
-    use("hrsh7th/cmp-nvim-lsp")
-    use("windwp/nvim-autopairs")
-    use("barrett-ruth/live-server.nvim")
-    use("tpope/vim-dadbod")
-    use("kristijanhusak/vim-dadbod-ui")
-    use("kristijanhusak/vim-dadbod-completion")
-    use({ "folke/noice.nvim", requires = { { "MunifTanjim/nui.nvim" } } })
-    use("christoomey/vim-tmux-navigator")
-
-    -- Automatically set up your configuration after cloning packer.nvim
-    -- Put this at the end after all plugins
-    if packer_bootstrap then
-        require("packer").sync()
-    end
-end)
+    },
+    {
+        "nvim-lualine/lualine.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("configs.lualine_config")
+        end,
+    },
+    {
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("configs.nvim-tree_config")
+        end,
+    },
+    {
+        "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        lazy = false,
+        build = ":TSUpdate",
+        config = function()
+            require("configs.nvim-treesitter_config")
+        end,
+    },
+    {
+        "nvim-telescope/telescope.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope-ui-select.nvim",
+        },
+        config = function()
+            require("configs.telescope_config")
+        end,
+    },
+    {
+        "saghen/blink.cmp",
+        version = "1.*",
+        dependencies = {
+            "L3MON4D3/LuaSnip",
+            "rafamadriz/friendly-snippets",
+            "kristijanhusak/vim-dadbod-completion",
+        },
+        config = function()
+            require("configs.completions_config")
+        end,
+    },
+    {
+        "neovim/nvim-lspconfig",
+        dependencies = {
+            "mason-org/mason.nvim",
+            "mason-org/mason-lspconfig.nvim",
+            "saghen/blink.cmp",
+        },
+        config = function()
+            require("configs.lsp_config")
+        end,
+    },
+    {
+        "stevearc/conform.nvim",
+        config = function()
+            require("configs.formatting")
+        end,
+    },
+    {
+        "mfussenegger/nvim-lint",
+        config = function()
+            require("configs.linting")
+        end,
+    },
+    {
+        "windwp/nvim-autopairs",
+        config = function()
+            require("configs.autopairs_config")
+        end,
+    },
+    { url = "https://forge.barrettruth.com/barrettruth/live-server.nvim", name = "live-server.nvim" },
+    { "kristijanhusak/vim-dadbod-ui", dependencies = { "tpope/vim-dadbod" } },
+    {
+        "folke/noice.nvim",
+        dependencies = { "MunifTanjim/nui.nvim" },
+        config = function()
+            require("configs.noice_config")
+        end,
+    },
+    { "christoomey/vim-tmux-navigator" },
+    {
+        "folke/which-key.nvim",
+        opts = {
+            preset = "modern",
+            spec = {
+                { "<leader>b", group = "buffers" },
+                { "<leader>f", group = "files" },
+                { "<leader>g", group = "git" },
+                { "<leader>o", group = "open" },
+                { "<leader>p", group = "project" },
+                { "<leader>ps", group = "search" },
+                { "<leader>P", group = "project (alias)" },
+                { "<leader>Ps", group = "search" },
+                { "<leader>w", group = "windows" },
+                { "<leader><Tab>", group = "tabs" },
+                { "<leader>l", group = "lsp" },
+                { "<leader>lg", group = "goto" },
+                { "<leader>lr", group = "refactor" },
+                { "<leader>la", group = "actions" },
+                { "<leader>t", group = "toggles" },
+                { "<leader>k", group = "docs / comments" },
+                { "<leader>m", group = "sql / databases" },
+                { "<leader>r", group = "refactor (legacy)" },
+                { "<leader>c", group = "code" },
+            },
+        },
+    },
+    {
+        "NeogitOrg/neogit",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "sindrets/diffview.nvim",
+            "nvim-telescope/telescope.nvim",
+        },
+        opts = {},
+    },
+    { "lewis6991/gitsigns.nvim", opts = {} },
+}, {
+    -- lazy resets packpath, so old Packer start packages are not loaded a second time.
+    performance = { reset_packpath = true, rtp = { disabled_plugins = { "netrwPlugin" } } },
+    rocks = { enabled = false }, -- No plugin in this configuration requires LuaRocks.
+    checker = { enabled = false },
+    change_detection = { notify = false },
+})
