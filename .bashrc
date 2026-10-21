@@ -150,11 +150,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Opening tmux on terminal startup
-# if command -v tmux &> /dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
-#   exec tmux
-# fi
-
 # Setting default editor for terminal
 export EDITOR=nvim
 
@@ -176,33 +171,6 @@ eval "$(pyenv init -)"
 
 #Loading pyenv-virtualenv
 eval "$(pyenv virtualenv-init -)"
-
-#function to connect to UNO odin server, and compile with gcc
-# function gccodin() {
-#     if [[ -z "$1" ]]; then
-#         echo "Usage: compile_c <filename.c>"
-#         return 1
-#     fi
-#
-#     if [[ "$1" != *.c ]]; then
-#         echo "Error: Filename must have a .c extension"
-#         return 1
-#     fi
-#
-#     local filename="${1%.c}"  # Remove .c extension for output name
-#
-#     gcc -Wall -Wstrict-prototypes -Wmissing-prototypes -o "$filename" "$1"
-#
-#     if [[ $? -eq 0 ]]; then
-#         echo "Compilation successful: ./$filename"
-#     else
-#         echo "Compilation failed."
-#     fi
-# }
-
-
-# Added by Antigravity CLI installer
-export PATH="/home/jbenitez/.local/bin:$PATH"
 
 function md() {
   pandoc $1 > /tmp/$1.html

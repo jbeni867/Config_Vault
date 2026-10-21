@@ -1,1 +1,3 @@
-require('live-server').setup(opts)
+vim.g.live_server = {
+    opts
+}
