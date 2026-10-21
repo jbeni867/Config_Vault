@@ -11,6 +11,7 @@ local parsers = {
     "xml",
     "c_sharp",
     "html",
+    "http",
     "css",
     "json",
     "sql",

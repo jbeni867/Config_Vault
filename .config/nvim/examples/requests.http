@@ -1,0 +1,15 @@
+# Start your API and adjust this URL before sending requests.
+@base_url = http://localhost:8080
+
+### Health check: put the cursor here and press Space r r
+GET {{base_url}}/health
+Accept: application/json
+
+### Create an item
+POST {{base_url}}/items
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Example item"
+}

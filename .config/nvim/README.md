@@ -86,6 +86,7 @@ All entries below start with **Space**:
 | `k` docs/comments | `ki` hover, `kc` comment line/selection |
 | `t` toggles | `tt` theme, `tw` wrap, `td` diagnostics, `tl` start live server, `tL` stop |
 | `m` SQL | `mo` explorer, `mc` choose connection, `mb` execute buffer, visual `mr` execute selection, `ms` sqlcmd terminal |
+| `r` HTTP | `rr` send request under cursor, `ro` open response, `re` select environment |
 | `?` | Show buffer-local mappings |
 
 Project switching lists open-buffer Git/package/Python roots and immediate
@@ -102,13 +103,38 @@ two separate project systems. Neovim tabs contain window layouts, not Emacs buff
 - Completion: `Tab` accepts a candidate (or advances a snippet), `Shift-Tab`
   jumps backward, `Ctrl-y` accepts, `Ctrl-e` cancels, `Ctrl-b/f` scroll docs.
 - Preserved aliases: `fg` grep, `fb` buffers, `fh` help, `;` tree focus,
-  `Space Esc` tree close, `ca` code action, `rr` rename, `Ctrl-k Ctrl-i` hover,
+  `Space Esc` tree close, `ca` code action, `Ctrl-k Ctrl-i` hover,
   `Ctrl-k Ctrl-d` format. Ctrl-k chords delay upward pane navigation until timeout.
-- **Intentional Emacs exceptions:** `rr` keeps Neovim's existing rename binding,
-  not restclient. Emacs Org/RSS, Markdown conversion/CSS selection, font scaling,
+- `Space r r` now sends HTTP requests, matching Emacs restclient. Rename is
+  available at `Space l r r` instead of the old `Space r r` alias.
+- **Intentional Emacs exceptions:** Emacs Org/RSS, Markdown conversion/CSS selection, font scaling,
   Sharper, Angular-specific LSP toggles, and MSSQL-specific connect/cancel/session
   commands are not ported. These were not features of the old Neovim config.
   SQL `mc` selects a Dadbod connection, not an MSSQL LSP connection.
+
+## HTTP requests
+
+[rest.nvim](https://github.com/rest-nvim/rest.nvim) provides a curl-backed HTTP
+client for `.http` files. Run `:Lazy sync`, then restart Neovim so the HTTP parser
+and dependencies are available. If needed, run `:TSInstall http` and wait for it
+to finish. No API account, Python provider, or system LuaRocks install is needed;
+the pure-Lua dependencies are managed by lazy.nvim and pinned in the lockfile.
+
+Open `examples/requests.http` from this directory, adjust the base URL to your API,
+and put the cursor on a request or its body:
+
+- `Space r r`: send **only the request under the cursor**.
+- `Space r o`: reopen the response pane (body/status, headers, cookies, statistics).
+- `Space r e`: select a `.env` file for request variables.
+- `q` in a response pane: close the split, or restore the previous buffer if it
+  occupies the only window. Editable `.http` files retain normal macro recording.
+- `Space l r r`: rename a code symbol (unchanged).
+
+Separate requests with `###`. GET, POST, headers, JSON bodies, and `{{variables}}`
+are supported. See the example for inline variables; for private tokens use an
+untracked `.env` file selected with `Space r e`. Keep credentials out of committed
+request examples. Only run trusted `.http` files: rest.nvim also supports scripted
+request hooks. Requests are sent only when explicitly invoked.
 
 ## Private/local settings
 
@@ -135,3 +161,11 @@ nvim --headless '+luafile ~/.config/nvim/tests/smoke.lua'
 Checks Lua syntax, described leader mappings, legacy-plugin exclusion, SQL
 completion, native LSP mapping scope, and plugin/command availability. It does
 not contact databases, exercise tmux panes, or verify every external server/tool.
+
+An additional HTTP integration test requires `python3` and uses only a temporary
+loopback server (GET, POST, cursor-selected requests, variable substitution,
+and closing response panes with `q`):
+
+```sh
+nvim --headless '+luafile ~/.config/nvim/tests/http.lua'
+```

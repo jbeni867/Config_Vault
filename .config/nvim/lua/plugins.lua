@@ -14,6 +14,11 @@ if not vim.uv.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+-- These pure-Lua libraries keep modules at the repository root, not lua/.
+local function lua_library(plugin)
+    package.path = plugin.dir .. "/?.lua;" .. plugin.dir .. "/?/init.lua;" .. package.path
+end
+
 require("lazy").setup({
     {
         "navarasu/onedark.nvim",
@@ -128,7 +133,7 @@ require("lazy").setup({
                 { "<leader>t", group = "toggles" },
                 { "<leader>k", group = "docs / comments" },
                 { "<leader>m", group = "sql / databases" },
-                { "<leader>r", group = "refactor (legacy)" },
+                { "<leader>r", group = "http requests" },
                 { "<leader>c", group = "code" },
             },
         },
@@ -143,10 +148,25 @@ require("lazy").setup({
         opts = {},
     },
     { "lewis6991/gitsigns.nvim", opts = {} },
+    {
+        "rest-nvim/rest.nvim",
+        ft = "http",
+        cmd = "Rest",
+        config = function()
+            require("configs.rest_config")
+        end,
+        dependencies = {
+            "nvim-neotest/nvim-nio",
+            { "j-hui/fidget.nvim", opts = {} },
+            { "lunarmodules/lua-mimetypes", config = lua_library },
+            { "manoelcampos/xml2lua", config = lua_library },
+        },
+    },
 }, {
     -- lazy resets packpath, so old Packer start packages are not loaded a second time.
     performance = { reset_packpath = true, rtp = { disabled_plugins = { "netrwPlugin" } } },
-    rocks = { enabled = false }, -- No plugin in this configuration requires LuaRocks.
+    -- rest.nvim's Lua libraries are pinned Git dependencies; parsers use Tree-sitter.
+    rocks = { enabled = false },
     checker = { enabled = false },
     change_detection = { notify = false },
 })

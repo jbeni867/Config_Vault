@@ -1,7 +1,7 @@
 require("mason").setup()
 
 -- One Python server, rather than pyright + basedpyright + Jedi competing.
-local servers = { "lua_ls", "omnisharp", "basedpyright", "html", "cssls", "eslint", "yamlls", "sqlls", "ts_ls" }
+local servers = { "lua_ls", "csharp_ls", "basedpyright", "html", "cssls", "eslint", "yamlls", "sqlls", "ts_ls" }
 vim.lsp.config("*", { capabilities = require("blink.cmp").get_lsp_capabilities() })
 vim.lsp.config("lua_ls", {
     settings = {

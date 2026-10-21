@@ -36,6 +36,12 @@ local function main()
     vim.cmd("enew")
     vim.bo.filetype = "sql"
     check(require("blink.cmp.config").sources.per_filetype.sql[1] == "dadbod", "SQL completion not configured")
+    check(vim.fn.maparg(" rr", "n"):find("Rest run", 1, true), "HTTP send mapping missing")
+    check(vim.fn.maparg(" lrr", "n", false, true).callback == vim.lsp.buf.rename, "Rename mapping changed")
+    vim.bo.filetype = "http"
+    check(vim.fn.exists(":Rest") == 2, "HTTP client command unavailable")
+    check(require("mimetypes").guess, "HTTP MIME support unavailable")
+    check(require("xml2lua").parser, "HTTP XML support unavailable")
     check(vim.v.errmsg == "", "Runtime error: " .. vim.v.errmsg)
     print("Neovim smoke tests passed")
 end
